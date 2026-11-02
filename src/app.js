@@ -1,185 +1,214 @@
-import { AudioDirector } from './audio.js';
-import { WIDTH, HEIGHT, DURATION, renderer, camera, CHAPTERS, setCameraAt, updateWorld, renderWorld } from './world.js';
+import {
+  renderer, camera, resizeRenderer, resetCamera, getGroundHeight,
+  updateWorld, renderWorld
+} from './world.js';
 
-const mount=document.querySelector('#world');mount.appendChild(renderer.domElement);
-const audio=new AudioDirector();
-const recordCanvas=document.createElement('canvas');recordCanvas.width=WIDTH;recordCanvas.height=HEIGHT;
-const recordCtx=recordCanvas.getContext('2d',{alpha:false});
-const $=id=>document.getElementById(id);
-let cinematic=false,manual=false,finished=false,elapsed=0,startedAt=0,lastChapter=-1,manualNight=false;
-let narratorEnabled=true,recordActive=false,recorder=null,recordChunks=[],displayAudioStream=null;
-let yaw=0,pitch=0,keys={};
-const intro=$('intro'),toastEl=$('toast'),playBtn=$('play'),recordBtn=$('record');
+const mount = document.querySelector('#world');
+mount.appendChild(renderer.domElement);
 
-function toast(message){
-  toastEl.textContent=message;toastEl.classList.add('show');
-  clearTimeout(toast._timer);toast._timer=setTimeout(()=>toastEl.classList.remove('show'),4200);
+const $ = id => document.getElementById(id);
+const intro = $('intro');
+const toastEl = $('toast');
+const keys = new Set();
+let yaw = 0;
+let pitch = .17;
+let playerY = 1.72;
+let verticalSpeed = 0;
+let grounded = true;
+let elapsed = 0;
+let lastFrame = performance.now();
+let touring = false;
+let tourElapsed = 0;
+let touchPointer = null;
+let lastTouchX = 0;
+let lastTouchY = 0;
+
+function toast(message) {
+  toastEl.textContent = message;
+  toastEl.classList.add('show');
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => toastEl.classList.remove('show'), 2600);
 }
-function chapterIndex(t){let i=0;for(let k=0;k<CHAPTERS.length;k++)if(t>=CHAPTERS[k].at)i=k;return i;}
-function updateCaption(t){
-  const idx=chapterIndex(t),c=CHAPTERS[idx];
-  if(idx!==lastChapter){
-    lastChapter=idx;
-    $('status').textContent='诗境 '+String(idx+1).padStart(2,'0')+' / 六';
-    $('chapter').textContent=c.title;$('verse').textContent=c.verse;$('note').textContent=c.note;
-    $('chapter-live').textContent=c.title;$('verse-live').textContent=c.verse;$('note-live').textContent=c.note;
-    document.querySelectorAll('.chapter-dot').forEach((dot,i)=>dot.classList.toggle('active',i<=idx));
-    if(cinematic&&narratorEnabled&&!audio.hasVoiceFile)audio.speak(c.verse);
-    audio.setChapter(idx);
+
+function applyLook() {
+  camera.rotation.order = 'YXZ';
+  camera.rotation.set(pitch, yaw, 0);
+}
+
+function resetPlayer() {
+  resetCamera();
+  yaw = 0;
+  pitch = .17;
+  playerY = 1.72;
+  verticalSpeed = 0;
+  grounded = true;
+  applyLook();
+  toast('已回到入口，滕王阁就在前方。');
+}
+
+function enterWorld() {
+  intro.classList.add('hidden');
+  if (matchMedia('(pointer:fine)').matches) {
+    renderer.domElement.requestPointerLock?.();
   }
-  const progress=$('progress');if(progress)progress.style.width=(t/DURATION*100)+'%';
-  $('progress-live').style.width=(t/DURATION*100)+'%';
+  toast('WASD 行走 · 鼠标环顾 · Shift 奔跑 · Space 跳跃');
 }
-const grainCanvas=document.createElement('canvas');
-grainCanvas.width=160;grainCanvas.height=160;
-const grainCtx=grainCanvas.getContext('2d');
-const grainImage=grainCtx.createImageData(160,160);
-for(let i=0;i<grainImage.data.length;i+=4){
-  const n=100+Math.random()*100;
-  grainImage.data[i]=n;grainImage.data[i+1]=n;grainImage.data[i+2]=n;grainImage.data[i+3]=34;
-}
-grainCtx.putImageData(grainImage,0,0);
-const grainPattern=recordCtx.createPattern(grainCanvas,'repeat');
 
-function drawRecordFrame(t){
-  const ctx=recordCtx;
-  ctx.drawImage(renderer.domElement,0,0,WIDTH,HEIGHT);
-
-  const vignette=ctx.createRadialGradient(WIDTH*.5,HEIGHT*.43,HEIGHT*.18,WIDTH*.5,HEIGHT*.48,HEIGHT*.72);
-  vignette.addColorStop(0,'rgba(5,11,11,0)');
-  vignette.addColorStop(.72,'rgba(5,11,11,.12)');
-  vignette.addColorStop(1,'rgba(5,11,11,.52)');
-  ctx.fillStyle=vignette;ctx.fillRect(0,0,WIDTH,HEIGHT);
-
-  const shade=ctx.createLinearGradient(0,1320,0,HEIGHT);
-  shade.addColorStop(0,'rgba(8,15,15,0)');
-  shade.addColorStop(.26,'rgba(8,15,15,.18)');
-  shade.addColorStop(1,'rgba(8,15,15,.78)');
-  ctx.fillStyle=shade;ctx.fillRect(0,0,WIDTH,HEIGHT);
-
-  const c=CHAPTERS[chapterIndex(t)];
-  ctx.save();
-  ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.shadowColor='rgba(0,0,0,.7)';ctx.shadowBlur=20;
-  ctx.fillStyle='rgba(232,216,181,.82)';
-  ctx.font='25px "Noto Serif SC","Songti SC","STSong",serif';
-  ctx.fillText('王 勃  ·  滕 王 阁 序',WIDTH/2,126);
-  ctx.strokeStyle='rgba(215,185,129,.5)';ctx.lineWidth=1;
-  ctx.beginPath();ctx.moveTo(390,165);ctx.lineTo(690,165);ctx.stroke();
-
-  ctx.fillStyle='rgba(218,185,126,.94)';
-  ctx.font='25px "Noto Serif SC","Songti SC","STSong",serif';
-  ctx.fillText(c.title,WIDTH/2,1452);
-
-  const long=c.verse.length>13;
-  const size=c.verse.length>17?43:(long?46:54);
-  ctx.fillStyle='#f2e7d0';
-  ctx.font='bold '+size+'px "Noto Serif SC","Songti SC","STSong",serif';
-  if(c.verse.length>13){
-    const split=c.verse.indexOf('，')>0?c.verse.indexOf('，')+1:Math.ceil(c.verse.length/2);
-    ctx.fillText(c.verse.slice(0,split),WIDTH/2,1540);
-    ctx.fillText(c.verse.slice(split),WIDTH/2,1610);
-  }else{
-    ctx.fillText(c.verse,WIDTH/2,1572);
+function updatePlayer(dt) {
+  const forward = { x: -Math.sin(yaw), z: -Math.cos(yaw) };
+  const right = { x: Math.cos(yaw), z: -Math.sin(yaw) };
+  let dx = 0, dz = 0;
+  if (keys.has('w') || keys.has('arrowup')) { dx += forward.x; dz += forward.z; }
+  if (keys.has('s') || keys.has('arrowdown')) { dx -= forward.x; dz -= forward.z; }
+  if (keys.has('a') || keys.has('arrowleft')) { dx -= right.x; dz -= right.z; }
+  if (keys.has('d') || keys.has('arrowright')) { dx += right.x; dz += right.z; }
+  const length = Math.hypot(dx, dz);
+  if (length > 0) {
+    const speed = keys.has('shift') ? 10.5 : 6.2;
+    camera.position.x += dx / length * speed * dt;
+    camera.position.z += dz / length * speed * dt;
   }
-  ctx.shadowBlur=0;
-  ctx.fillStyle='rgba(225,211,184,.76)';
-  ctx.font='24px "Noto Serif SC","Songti SC","STSong",serif';
-  ctx.fillText(c.note,WIDTH/2,1700);
 
-  ctx.strokeStyle='rgba(211,181,126,.55)';ctx.lineWidth=1;
-  ctx.beginPath();ctx.moveTo(170,1792);ctx.lineTo(910,1792);ctx.stroke();
-  ctx.fillStyle='rgba(222,202,161,.7)';
-  ctx.font='18px "Noto Serif SC","Songti SC","STSong",serif';
-  ctx.fillText('江 天 一 阁  ·  秋 水 长 天',WIDTH/2,1840);
+  camera.position.x = Math.max(-88, Math.min(88, camera.position.x));
+  camera.position.z = Math.max(-132, Math.min(42, camera.position.z));
 
-  ctx.fillStyle='rgba(126,47,39,.92)';ctx.fillRect(944,1808,58,58);
-  ctx.strokeStyle='rgba(235,211,172,.82)';ctx.lineWidth=2;ctx.strokeRect(950,1814,46,46);
-  ctx.fillStyle='#ead9b9';ctx.font='28px KaiTi,STKaiti,serif';ctx.fillText('诗',973,1838);
-
-  ctx.globalAlpha=.055;ctx.fillStyle=grainPattern;ctx.fillRect(0,0,WIDTH,HEIGHT);
-  ctx.restore();
+  const floorY = getGroundHeight(camera.position.x, camera.position.z) + 1.72;
+  if (keys.has(' ') && grounded) {
+    verticalSpeed = 6.2;
+    grounded = false;
+  }
+  if (!grounded) {
+    verticalSpeed -= 17 * dt;
+    playerY += verticalSpeed * dt;
+    if (playerY <= floorY) {
+      playerY = floorY;
+      verticalSpeed = 0;
+      grounded = true;
+    }
+  } else {
+    playerY = floorY;
+  }
+  camera.position.y = playerY;
+  applyLook();
+  $('coords').textContent = '位置 ' + camera.position.x.toFixed(0) + ' / ' + camera.position.z.toFixed(0);
 }
-function updateManual(dt){
-  const speed=6.5*dt,forward=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw)),right=new THREE.Vector3(Math.cos(yaw),0,-Math.sin(yaw));
-  if(keys.w)camera.position.addScaledVector(forward,speed);if(keys.s)camera.position.addScaledVector(forward,-speed);
-  if(keys.a)camera.position.addScaledVector(right,-speed);if(keys.d)camera.position.addScaledVector(right,speed);
-  camera.rotation.order='YXZ';camera.rotation.y=yaw;camera.rotation.x=pitch;
-}
-import * as THREE from 'three';
-document.addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;});
-document.addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=false;});
-renderer.domElement.addEventListener('click',()=>{if(manual&&document.pointerLockElement!==renderer.domElement)renderer.domElement.requestPointerLock?.();});
-document.addEventListener('mousemove',e=>{if(manual&&document.pointerLockElement===renderer.domElement){yaw-=e.movementX*.0018;pitch=Math.max(-1.1,Math.min(1.1,pitch-e.movementY*.0018));}});
-document.addEventListener('pointerlockchange',()=>{if(!document.pointerLockElement&&manual)toast('轻触画面可继续漫游。');});
 
-async function startJourney(){
-  await audio.start();intro.classList.add('hidden');manual=false;manualNight=false;cinematic=true;finished=false;elapsed=0;lastChapter=-1;startedAt=performance.now();audio.resumeVoice();
-  camera.position.set(0,1.68,10);updateCaption(0);if(narratorEnabled)audio.startVoiceTrack();audio.startMusicTrack();
-  playBtn.textContent='暂停诗境';toast('诗卷已展开，请随镜而行。');
+const tourFrames = [
+  { t: 0, p: [0, 2, 38], l: [0, 10, 1] },
+  { t: 7, p: [-10, 3.2, 29], l: [0, 11, 1] },
+  { t: 15, p: [-13, 7, 12], l: [0, 12, 0] },
+  { t: 23, p: [-2, 8, 15], l: [0, 5, -52] },
+  { t: 32, p: [12, 5, 14], l: [0, 6, -54] },
+  { t: 42, p: [0, 2, 38], l: [0, 10, 1] }
+];
+function updateTour(dt) {
+  tourElapsed += dt;
+  const t = Math.min(tourElapsed, 42);
+  let i = 0;
+  while (i < tourFrames.length - 2 && t > tourFrames[i + 1].t) i++;
+  const a = tourFrames[i], b = tourFrames[i + 1];
+  const raw = Math.max(0, Math.min(1, (t - a.t) / (b.t - a.t)));
+  const f = raw * raw * (3 - 2 * raw);
+  const p = a.p.map((v, k) => v + (b.p[k] - v) * f);
+  const l = a.l.map((v, k) => v + (b.l[k] - v) * f);
+  camera.position.set(p[0], p[1], p[2]);
+  camera.lookAt(l[0], l[1], l[2]);
+  if (t >= 42) {
+    touring = false;
+    $('tour').classList.remove('selected');
+    $('mode').textContent = '自由探索';
+    toast('导览结束，现在可以自由探索。');
+  }
 }
-function pauseJourney(){
-  if(cinematic){cinematic=false;audio.pauseVoice();playBtn.textContent='继续诗境';}
-  else if(!finished){cinematic=true;startedAt=performance.now()-elapsed*1000;audio.resumeVoice();playBtn.textContent='暂停诗境';}
-}
-function restartJourney(){audio.stopVoice();startJourney();}
-playBtn.addEventListener('click',()=>{if(cinematic)pauseJourney();else if(!finished&&elapsed>0)pauseJourney();else startJourney();});
-$('close-intro').addEventListener('click',startJourney);
-$('restart').addEventListener('click',restartJourney);
-$('roam').addEventListener('click',()=>{cinematic=false;manual=true;finished=false;intro.classList.add('hidden');audio.start();camera.position.set(0,1.68,10);yaw=0;pitch=0;toast('漫游已开启：W、A、S、D 行走，鼠标转身。');});
-$('day').addEventListener('click',()=>{manualNight=!manualNight;toast(manualNight?'夜色已至。':'霞光重临。');});
-$('narrator').addEventListener('click',()=>{narratorEnabled=!narratorEnabled;$('narrator').textContent=narratorEnabled?'诵读：开':'诵读：静';if(!narratorEnabled){audio.stopSpeech();audio.voiceElement?.pause();}else if(cinematic&&audio.hasVoiceFile)audio.voiceElement?.play().catch(()=>{});});
-$('voice-file').addEventListener('change',async e=>{const file=e.target.files&&e.target.files[0];if(file){await audio.loadVoiceFile(file);toast('已载入男声旁白：'+file.name);}});
-$('music-file').addEventListener('change',async e=>{const file=e.target.files&&e.target.files[0];if(file){await audio.loadMusicFile(file);toast('已载入配乐音轨：'+file.name);}});
-$('listen').addEventListener('click',async()=>{await audio.start();audio.speak('云销雨霁，彩彻区明。落霞与孤鹜齐飞，秋水共长天一色。');});
-$('fullscreen').addEventListener('click',()=>document.documentElement.requestFullscreen?.());
 
-let lastFrame=performance.now();
-function frame(now){
-  const dt=Math.min((now-lastFrame)/1000,.05);lastFrame=now;
-  if(cinematic){
-    elapsed=Math.max(0,Math.min(DURATION,(now-startedAt)/1000));
-    setCameraAt(elapsed);updateCaption(elapsed);
-    if(elapsed>=DURATION&&!finished){finished=true;cinematic=false;audio.pauseVoice();playBtn.textContent='重启诗境';toast('诗境已尽。长江仍在，余韵未散。');if(recordActive)stopRecording();}
-  }else if(manual){elapsed+=dt;updateManual(dt);}
-  const worldTime=cinematic||(!manual&&elapsed>0)?elapsed:(manual?12+now/100000:manualNight?78:12);
-  updateWorld(worldTime,dt,manualNight);audio.update(worldTime);renderWorld();drawRecordFrame(elapsed);
+function startTour() {
+  touring = !touring;
+  tourElapsed = 0;
+  if (touring) {
+    intro.classList.add('hidden');
+    document.exitPointerLock?.();
+    $('tour').classList.add('selected');
+    $('mode').textContent = '自动导览';
+    toast('开始 42 秒场景导览。');
+  } else {
+    $('tour').classList.remove('selected');
+    $('mode').textContent = '自由探索';
+    resetPlayer();
+  }
+}
+
+$('enter').addEventListener('click', enterWorld);
+$('reset').addEventListener('click', resetPlayer);
+$('tour').addEventListener('click', startTour);
+$('fullscreen').addEventListener('click', () => {
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+  else document.exitFullscreen?.();
+});
+
+document.addEventListener('keydown', event => {
+  const key = event.key.toLowerCase();
+  if ([' ', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) event.preventDefault();
+  keys.add(key);
+  if (key === 'escape') $('mode').textContent = '自由探索';
+});
+document.addEventListener('keyup', event => keys.delete(event.key.toLowerCase()));
+window.addEventListener('blur', () => keys.clear());
+
+renderer.domElement.addEventListener('click', () => {
+  if (!touring && matchMedia('(pointer:fine)').matches && document.pointerLockElement !== renderer.domElement) {
+    renderer.domElement.requestPointerLock?.();
+  }
+});
+document.addEventListener('mousemove', event => {
+  if (document.pointerLockElement === renderer.domElement && !touring) {
+    yaw -= event.movementX * .0021;
+    pitch = Math.max(-1.15, Math.min(1.05, pitch - event.movementY * .0018));
+  }
+});
+
+renderer.domElement.addEventListener('pointerdown', event => {
+  if (event.pointerType !== 'touch' || touring) return;
+  touchPointer = event.pointerId;
+  lastTouchX = event.clientX;
+  lastTouchY = event.clientY;
+  renderer.domElement.setPointerCapture?.(event.pointerId);
+});
+renderer.domElement.addEventListener('pointermove', event => {
+  if (event.pointerId !== touchPointer || touring) return;
+  const dx = event.clientX - lastTouchX;
+  const dy = event.clientY - lastTouchY;
+  lastTouchX = event.clientX;
+  lastTouchY = event.clientY;
+  yaw -= dx * .004;
+  pitch = Math.max(-1.15, Math.min(1.05, pitch - dy * .003));
+});
+renderer.domElement.addEventListener('pointerup', event => {
+  if (event.pointerId === touchPointer) touchPointer = null;
+});
+renderer.domElement.addEventListener('pointercancel', () => { touchPointer = null; });
+
+document.querySelectorAll('[data-key]').forEach(button => {
+  const key = button.dataset.key;
+  const down = event => { event.preventDefault(); keys.add(key); button.classList.add('pressed'); };
+  const up = event => { event.preventDefault(); keys.delete(key); button.classList.remove('pressed'); };
+  button.addEventListener('pointerdown', down);
+  button.addEventListener('pointerup', up);
+  button.addEventListener('pointerleave', up);
+  button.addEventListener('pointercancel', up);
+});
+
+window.addEventListener('resize', resizeRenderer);
+
+function frame(now) {
+  const dt = Math.min((now - lastFrame) / 1000, .04);
+  lastFrame = now;
+  elapsed += dt;
+  if (touring) updateTour(dt);
+  else updatePlayer(dt);
+  updateWorld(elapsed, dt);
+  renderWorld();
   requestAnimationFrame(frame);
 }
+resetCamera();
+applyLook();
 requestAnimationFrame(frame);
-
-function downloadBlob(blob,name){
-  const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
-}
-async function startRecording(){
-  if(!window.MediaRecorder||!recordCanvas.captureStream){toast('此浏览器暂不支持网页录制，请使用桌面版 Chrome 或 Edge。');return;}
-  await audio.start();let audioTracks=[];
-  if(!audio.hasVoiceFile&&narratorEnabled&&navigator.mediaDevices?.getDisplayMedia){
-    try{
-      toast('请选择当前浏览器标签页，并勾选“共享标签页音频”，以收录朗诵与配乐。');
-      displayAudioStream=await navigator.mediaDevices.getDisplayMedia({video:true,audio:true});
-      audioTracks=displayAudioStream.getAudioTracks();
-      if(!audioTracks.length)toast('未取得标签页声音：本次将录制原创配乐，旁白请另行配音。');
-    }catch(e){toast('未授权标签页音频，将使用网页原创配乐录制。');}
-  }
-  if(!audioTracks.length)audioTracks=audio.getStream().getAudioTracks();
-  const videoStream=recordCanvas.captureStream(30);
-  const stream=new MediaStream([...videoStream.getVideoTracks(),...audioTracks]);
-  const mime=['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'].find(t=>MediaRecorder.isTypeSupported(t))||'';
-  recordChunks=[];
-  try{
-    recorder=new MediaRecorder(stream,mime?{mimeType:mime,videoBitsPerSecond:9000000}:undefined);
-    recorder.ondataavailable=e=>{if(e.data&&e.data.size)recordChunks.push(e.data);};
-    recorder.onstop=()=>{
-      const blob=new Blob(recordChunks,{type:recorder.mimeType||'video/webm'});
-      downloadBlob(blob,'滕王阁序-第一人称诗境.webm');recordActive=false;recordBtn.textContent='录制诗境';recordBtn.classList.remove('active');
-      videoStream.getTracks().forEach(t=>t.stop());displayAudioStream?.getTracks().forEach(t=>t.stop());displayAudioStream=null;
-      toast('影像已录成 WebM，可用剪映或 CapCut 导出 MP4。');
-    };
-    recorder.start(1000);recordActive=true;recordBtn.textContent='停止录制';recordBtn.classList.add('active');
-    await startJourney();
-  }catch(e){toast('录制未能开始：'+e.message);recordActive=false;}
-}
-function stopRecording(){if(recorder&&recorder.state!=='inactive')recorder.stop();}
-recordBtn.addEventListener('click',()=>{if(recordActive)stopRecording();else startRecording();});
-window.addEventListener('beforeunload',()=>audio.stopVoice());
