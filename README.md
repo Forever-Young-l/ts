@@ -1,47 +1,43 @@
-# 江天一阁 · 走进《滕王阁序》
+# 滕王阁 · 江南方块世界
 
-A cinematic first-person Three.js journey inspired by Wang Bo's Preface to the Pavilion of Prince Teng. The visual direction is a restrained, painterly interpretation of Tang-era Jiangnan: real architectural proportions, curved tiled eaves, lacquered timber, aged stone, atmospheric distance, a broad river and a carefully controlled dusk palette.
+一个以 Minecraft / voxel 美术语言构建的中国古典建筑探索场景。项目当前目标是先把一个完整、统一、可漫游的方块世界做好，而不是追求写实材质或复杂电影包装。
 
-## Art direction
+## V1 场景
 
-- No block-world treatment. Architectural volumes use cylindrical vermilion columns, timber joinery, layered dougong brackets, custom curved hip-roof surfaces, glazed-tile textures, stone plinths and carved details.
-- The voxel influence is reduced to occasional structural rhythm and crisp silhouettes; it is not the dominant visual language.
-- Palette: ink jade, old cinnabar, weathered timber, river slate, dusk rose, pale bronze and parchment.
-- Composition: first-person eye-level camera, framed by pavilion eaves and columns, then opening to the river and distant mountain layers.
-- Atmosphere: procedural sky gradient, drifting cloud veils, layered mountain silhouettes, water shimmer, fading rain, reed movement, egret and geese flight, lantern light.
-- No modern buildings, traffic, electric fixtures, contemporary clothing, logos or technology in the poetic world.
+- 三层对称滕王阁：朱红方柱、深色木梁、层叠青黛色方块屋檐、金色脊饰、木质回廊和像素牌匾。
+- 石质台基、宽阔中央台阶和通往主楼的石板路径。
+- 江南草地、方块树木、岸边芦苇、层叠远山与暖色天空。
+- 宽阔江面、像素化霞光倒影和缓慢行驶的乌篷船。
+- 方块云层与飞鸟持续运动。
+- InstancedMesh 批量绘制静态方块，减少场景 draw calls。
 
-## Experience
+## 操作
 
-- 80-second automatic camera journey across six poem chapters.
-- Free-roam mode (W/A/S/D + mouse pointer lock).
-- A layered pavilion with three roof tiers, carved timber brackets, stone terrace, a side stair and upper gallery.
-- Animated dusk-to-night transition and river reflections.
-- A drifting traditional covered fishing boat, birds, clouds, rain and reeds.
-- Original Web Audio plucked-string ambience.
-- Browser Chinese voice preview; optional upload of a professionally recorded male narration track and licensed/original music track.
-- Clean 1080 × 1920, 30 fps portrait recording to WebM.
+- W / A / S / D：移动
+- 鼠标：环顾四周（桌面端点击画面锁定指针）
+- Shift：奔跑
+- Space：跳跃
+- 自动导览：观看 42 秒场景路线
+- 重置视角：返回入口位置
+- 全屏：沉浸式浏览
 
-## Run locally
+移动设备支持触屏拖动视角和屏幕方向键。
 
-Run a local static server with Python's http.server on port 8000, then open localhost:8000. The page loads Three.js 0.160 from jsDelivr, so the browser needs network access.
+## 技术
 
-## Storyboard
+- Three.js 0.160
+- 原生 ES Modules
+- GitHub Pages
+- GitHub Actions 自动部署
 
-The six-chapter timed shot list and narration cues are in docs/shotlist.md.
+## 本地运行
 
-## Record a film
+在项目根目录运行静态服务器，例如：
 
-1. Open the page in desktop Chrome or Edge.
-2. For a release-quality result, upload a recorded male narration track and an original/licensed guqin-xiao music track.
-3. Press the record button. If relying on browser speech synthesis, select this tab in the capture picker and enable Share tab audio.
-4. The 80-second camera path runs automatically and records a 1080 × 1920 portrait WebM.
-5. Import the WebM into Jianying / CapCut and export H.264 MP4 at 1080 × 1920, 30 fps.
+python3 -m http.server 8000
 
-## Narration note
+然后访问 localhost:8000。Three.js 通过 jsDelivr 加载，因此需要网络连接。
 
-Browser speech synthesis depends on installed system voices. It can preview the poem but cannot guarantee a mature male timbre. A professionally recorded voice track is recommended for the final film.
+## 当前范围与后续
 
-## Historical note
-
-This is a poetic, stylized reconstruction rather than a measured survey of the present-day Tengwang Pavilion. Architectural details are composed to serve the camera journey and should not be read as a conservation-grade historical model.
+V1 聚焦场景大形、方块建筑语言、空间构图和第一人称漫游。后续再根据真实截图调整楼阁比例、屋檐层级、环境构图和性能；录制、配音、字幕等视频制作功能暂不混入这个基础场景版本。
