@@ -91,8 +91,7 @@ button{font:inherit}
 <div class="toast" id="toast"></div>
 <div id="boot-error" role="alert" hidden></div>
 <script type="module">
-try {
-  import('./src/app.js?v=voxel-fix-1').catch(error => {
+import('./src/app.js?v=voxel-fix-1').catch(error => {
   console.error('Voxel world failed to start:', error);
   const panel = document.getElementById('boot-error');
   panel.hidden = false;
