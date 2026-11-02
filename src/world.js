@@ -46,6 +46,7 @@ const palette = {
 };
 
 const staticBlocks = new Map();
+const waterGlints = [];
 const cube = new THREE.BoxGeometry(1, 1, 1);
 const temp = new THREE.Object3D();
 
@@ -183,7 +184,7 @@ function buildPavilion() {
   const z = 1;
   fillLayer(-13, 13, -10, 12, .05, palette.stone, 1.1, 1.05, 1.05);
   fillLayer(-13, 13, -10, 12, .68, palette.stoneDark, .22, 1.05, 1.05);
-  fillLayer(-11, 11, -8, 10, 1.05, palette.wood, .45, 1.02, 1.02);
+  fillLayer(-11, 11, -8, 10, .87, palette.wood, .34, 1.02, 1.02);
 
   for (let x = -13; x <= 13; x++) {
     addBlock(x, 1.25, -10, 1, .25, 1, palette.stoneLight);
@@ -195,8 +196,8 @@ function buildPavilion() {
   }
 
   addLevel(1.45, 20, 14, 4.2, 6.25, 4, z, { walls: true, openCenter: true });
-  addLevel(9.05, 16, 11, 3.5, 13.05, 4, z, { walls: true, openCenter: true });
-  addLevel(16.05, 11, 8, 3.0, 19.55, 4, z, { walls: true, openCenter: true });
+  addLevel(9.8, 16, 11, 3.5, 13.8, 4, z, { walls: true, openCenter: true });
+  addLevel(17.35, 11, 8, 3.0, 20.85, 4, z, { walls: true, openCenter: true });
 
   // Broad stone steps and a clear central approach.
   for (let i = 0; i < 8; i++) {
@@ -216,6 +217,20 @@ function buildPavilion() {
   addBlock(0, 5.35, 8.65, 5.4, 1.45, .5, palette.redDark);
   addBlock(0, 5.35, 8.93, 5.1, 1.18, .12, palette.gold);
   addBlock(0, 5.35, 9.02, 4.85, .96, .08, palette.redDark);
+  const signCanvas = document.createElement('canvas');
+  signCanvas.width = 512; signCanvas.height = 128;
+  const signCtx = signCanvas.getContext('2d');
+  signCtx.fillStyle = '#542a27'; signCtx.fillRect(0, 0, 512, 128);
+  signCtx.strokeStyle = '#d0aa68'; signCtx.lineWidth = 7; signCtx.strokeRect(8, 8, 496, 112);
+  signCtx.fillStyle = '#f0d59b'; signCtx.font = 'bold 78px KaiTi, STKaiti, serif';
+  signCtx.textAlign = 'center'; signCtx.textBaseline = 'middle'; signCtx.fillText('滕 王 阁', 256, 66);
+  const signTexture = new THREE.CanvasTexture(signCanvas);
+  signTexture.colorSpace = THREE.SRGBColorSpace;
+  signTexture.magFilter = THREE.NearestFilter;
+  signTexture.minFilter = THREE.NearestFilter;
+  const sign = new THREE.Mesh(new THREE.PlaneGeometry(4.65, 1.05), new THREE.MeshBasicMaterial({ map: signTexture }));
+  sign.position.set(0, 5.35, 9.1);
+  scene.add(sign);
 }
 
 function addTree(x, z, scale = 1, seed = 1) {
@@ -272,6 +287,7 @@ function buildLandscape() {
     );
     m.position.set((seeded(i + 9) - .5) * 56, -.29, -35 - seeded(i + 17) * 46);
     reflections.add(m);
+    waterGlints.push(m);
   }
   scene.add(reflections);
   reflections.userData.animate = true;
@@ -461,7 +477,7 @@ export function getGroundHeight(x, z) {
   if (Math.abs(x) < 3.7 && z >= 10.2 && z <= 24.5) {
     return clamp((24.5 - z) / 14.3, 0, 1) * .8;
   }
-  if (Math.abs(x) <= 13 && z >= -10 && z <= 12) return .8;
+  if (Math.abs(x) <= 13 && z >= -10 && z <= 12) return 1.04;
   return 0;
 }
 
@@ -475,6 +491,12 @@ export function updateWorld(time, dt) {
   }
   pos.needsUpdate = true;
   water.geometry.computeVertexNormals();
+
+  waterGlints.forEach((m, i) => {
+    m.position.x += dt * (.45 + (i % 4) * .18);
+    if (m.position.x > 32) m.position.x = -32;
+    m.material.opacity = .13 + Math.sin(t * .8 + i) * .045;
+  });
 
   boat.position.x = -26 + ((t * .52) % 52);
   boat.position.z = -51 + Math.sin(t * .18) * 1.2;
