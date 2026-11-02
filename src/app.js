@@ -76,7 +76,7 @@ $('close-intro').addEventListener('click',startJourney);
 $('restart').addEventListener('click',restartJourney);
 $('roam').addEventListener('click',()=>{cinematic=false;manual=true;finished=false;intro.classList.add('hidden');audio.start();camera.position.set(0,1.72,25);yaw=0;pitch=0;toast('漫游已开启：W、A、S、D 行走，鼠标转身。');});
 $('day').addEventListener('click',()=>{manualNight=!manualNight;toast(manualNight?'夜色已至。':'霞光重临。');});
-$('narrator').addEventListener('click',()=>{narratorEnabled=!narratorEnabled;$('narrator').textContent=narratorEnabled?'诵读：开':'诵读：静';if(!narratorEnabled)audio.stopSpeech();});
+$('narrator').addEventListener('click',()=>{narratorEnabled=!narratorEnabled;$('narrator').textContent=narratorEnabled?'诵读：开':'诵读：静';if(!narratorEnabled){audio.stopSpeech();audio.voiceElement?.pause();}else if(cinematic&&audio.hasVoiceFile)audio.voiceElement?.play().catch(()=>{});});
 $('voice-file').addEventListener('change',async e=>{const file=e.target.files&&e.target.files[0];if(file){await audio.loadVoiceFile(file);toast('已载入男声旁白：'+file.name);}});
 $('music-file').addEventListener('change',async e=>{const file=e.target.files&&e.target.files[0];if(file){await audio.loadMusicFile(file);toast('已载入配乐音轨：'+file.name);}});
 $('listen').addEventListener('click',async()=>{await audio.start();audio.speak('云销雨霁，彩彻区明。落霞与孤鹜齐飞，秋水共长天一色。');});
