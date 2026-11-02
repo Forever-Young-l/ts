@@ -1,7 +1,7 @@
 import {
   renderer, camera, resizeRenderer, resetCamera, getGroundHeight,
   updateWorld, renderWorld
-} from './world.js';
+} from './world.js?v=voxel-fix-1';
 
 const mount = document.querySelector('#world');
 mount.appendChild(renderer.domElement);
