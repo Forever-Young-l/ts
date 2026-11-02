@@ -19,6 +19,10 @@ Run a local static server with Python's http.server on port 8000, then open loca
 
 The page loads Three.js 0.160 from jsDelivr, so the browser needs network access for the library.
 
+## Storyboard and narration
+
+The timed six-chapter shot list and narration cues are in docs/shotlist.md.
+
 ## Record a film
 
 1. Open the page in desktop Chrome or Edge.
