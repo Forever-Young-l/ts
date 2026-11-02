@@ -62,8 +62,8 @@ document.addEventListener('mousemove',e=>{if(manual&&document.pointerLockElement
 document.addEventListener('pointerlockchange',()=>{if(!document.pointerLockElement&&manual)toast('轻触画面可继续漫游。');});
 
 async function startJourney(){
-  await audio.start();intro.classList.add('hidden');manual=false;manualNight=false;cinematic=true;finished=false;elapsed=0;lastChapter=-1;startedAt=performance.now();
-  camera.position.set(0,1.72,31);updateCaption(0);if(narratorEnabled)audio.startVoiceTrack();
+  await audio.start();intro.classList.add('hidden');manual=false;manualNight=false;cinematic=true;finished=false;elapsed=0;lastChapter=-1;startedAt=performance.now();audio.resumeVoice();
+  camera.position.set(0,1.72,31);updateCaption(0);if(narratorEnabled)audio.startVoiceTrack();audio.startMusicTrack();
   playBtn.textContent='暂停诗境';toast('诗卷已展开，请随镜而行。');
 }
 function pauseJourney(){
@@ -77,7 +77,8 @@ $('restart').addEventListener('click',restartJourney);
 $('roam').addEventListener('click',()=>{cinematic=false;manual=true;finished=false;intro.classList.add('hidden');audio.start();camera.position.set(0,1.72,25);yaw=0;pitch=0;toast('漫游已开启：W、A、S、D 行走，鼠标转身。');});
 $('day').addEventListener('click',()=>{manualNight=!manualNight;toast(manualNight?'夜色已至。':'霞光重临。');});
 $('narrator').addEventListener('click',()=>{narratorEnabled=!narratorEnabled;$('narrator').textContent=narratorEnabled?'诵读：开':'诵读：静';if(!narratorEnabled)audio.stopSpeech();});
-$('voice-file').addEventListener('change',async e=>{const file=e.target.files&&e.target.files[0];if(file){await audio.loadVoiceFile(file);toast('已载入旁白音轨：'+file.name);}});
+$('voice-file').addEventListener('change',async e=>{const file=e.target.files&&e.target.files[0];if(file){await audio.loadVoiceFile(file);toast('已载入男声旁白：'+file.name);}});
+$('music-file').addEventListener('change',async e=>{const file=e.target.files&&e.target.files[0];if(file){await audio.loadMusicFile(file);toast('已载入配乐音轨：'+file.name);}});
 $('listen').addEventListener('click',async()=>{await audio.start();audio.speak('云销雨霁，彩彻区明。落霞与孤鹜齐飞，秋水共长天一色。');});
 $('fullscreen').addEventListener('click',()=>document.documentElement.requestFullscreen?.());
 
