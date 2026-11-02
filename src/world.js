@@ -116,10 +116,10 @@ function addRailing(width, depth, baseY, centerZ, openCenter = false) {
     addBlock(x, y - .45, z, .42, .95, .42, palette.woodLight);
     addBlock(x, y + .12, z, .62, .2, .62, palette.gold);
   }
-  addBeam(-Math.floor(width / 2) + 1, Math.floor(width / 2) - 1, z, y + .15, palette.wood, .55, .35);
+  addBeam(-Math.floor(width / 2) + 1, Math.floor(width / 2) - 1, z, y + .15, palette.woodLight, .55, .35);
   addBeam(-Math.floor(width / 2) + 1, Math.floor(width / 2) - 1, z, y - .55, palette.woodDark, .45, .22);
   for (const x of [-Math.floor(width / 2) + 1, Math.floor(width / 2) - 1]) {
-    addSideBeam(x, centerZ - Math.floor(depth / 2) + 1, centerZ + Math.floor(depth / 2) - 1, y + .15, palette.wood, .5, .35);
+    addSideBeam(x, centerZ - Math.floor(depth / 2) + 1, centerZ + Math.floor(depth / 2) - 1, y + .15, palette.woodLight, .5, .35);
   }
 }
 
@@ -130,7 +130,7 @@ function addWallPanels(width, depth, baseY, height, centerZ, options = {}) {
     for (let y = 1; y < top - 1; y++) {
       const windowSlot = Math.abs(x) > 1 && (x % 4 === 0 || x % 4 === 1);
       if (windowSlot && y > 1) continue;
-      addBlock(x, baseY + y, backZ, .94, .94, .35, y % 2 ? palette.wood : palette.woodDark);
+      addBlock(x, baseY + y, backZ, .94, .94, .35, y % 2 ? palette.wood[(x + y + 8) % palette.wood.length] : palette.woodDark);
     }
   }
   for (const side of [-1, 1]) {
@@ -138,7 +138,7 @@ function addWallPanels(width, depth, baseY, height, centerZ, options = {}) {
     for (let z = centerZ - Math.floor(depth / 2) + 2; z <= centerZ + Math.floor(depth / 2) - 2; z++) {
       for (let y = 1; y < top - 1; y++) {
         if (y > 1 && z % 4 !== 0 && z % 4 !== 1) continue;
-        addBlock(sideX, baseY + y, z, .35, .94, .94, y % 2 ? palette.wood : palette.woodDark);
+        addBlock(sideX, baseY + y, z, .35, .94, .94, y % 2 ? palette.wood[(z + y + 8) % palette.wood.length] : palette.woodDark);
       }
     }
   }
@@ -475,7 +475,8 @@ export function resetCamera() {
 
 export function getGroundHeight(x, z) {
   if (Math.abs(x) < 3.7 && z >= 10.2 && z <= 24.5) {
-    return clamp((24.5 - z) / 14.3, 0, 1) * .8;
+    const step = clamp(Math.floor((24.5 - z) / 1.55), 0, 7);
+    return .175 + step * .12;
   }
   if (Math.abs(x) <= 13 && z >= -10 && z <= 12) return 1.04;
   return 0;
