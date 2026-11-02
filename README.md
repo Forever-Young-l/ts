@@ -9,7 +9,7 @@ A first-person, code-built Three.js poetic journey inspired by Wang Bo's Preface
 - Dynamic rain clearing, moving cloud layers, river shimmer, drifting fishing boat, flying egret and geese, swaying reeds and flickering lanterns
 - Original plucked-string ambient score generated in Web Audio
 - Chinese voice narration preview using the browser's available zh-CN speech voice; it prefers a male-labelled voice where available
-- Optional upload of a complete recorded male narration track (MP3/WAV)
+- Optional upload of a complete recorded male narration track and a licensed original music track (MP3/WAV)
 - 1080 × 1920 portrait composition captured from a clean scene canvas
 - Browser recording to WebM; import into Jianying / CapCut to export MP4
 
@@ -29,7 +29,7 @@ The timed six-chapter shot list and narration cues are in docs/shotlist.md.
 2. Press the record button.
 3. In the browser capture picker, select this tab and enable Share tab audio. This captures browser speech synthesis with the original score.
 4. The 80-second camera path starts automatically. The video is recorded as a portrait 1080 × 1920 WebM.
-5. If you have a professionally recorded male narration track, upload the full voice track before recording. It is mixed with the generated score.
+5. For release-quality sound, upload a professionally recorded male narration track and a licensed/original guqin-xiao music track before recording. Both are mixed into the recorded audio. Without uploads, the app uses browser speech synthesis and its procedural plucked-string ambience.
 6. Import the WebM into Jianying / CapCut and export H.264 MP4 at 1080 × 1920, 30 fps.
 
 ## Narration notes
