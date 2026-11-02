@@ -222,11 +222,11 @@ const KEYFRAMES=[
   {t:0,p:[0,1.72,31],l:[0,5.2,7]},
   {t:7,p:[0,1.72,21],l:[0,5.7,5]},
   {t:13,p:[-5.2,1.85,8.5],l:[-8,4.2,0]},
-  {t:20,p:[-8.2,5.2,4.5],l:[-8,7.4,-10]},
+  {t:20,p:[-8.2,5.4,2.5],l:[-8,7.4,-10]},
   {t:27,p:[-8.2,7.78,-2.4],l:[-2,8.4,-24]},
   {t:34,p:[-3.8,7.78,-3.1],l:[0,8.2,-48]},
   {t:42,p:[0,7.78,-3.1],l:[0,8.1,-72]},
-  {t:53,p:[1,7.78,-3.1],l:[-24,1,-33]},
+  {t:53,p:[1,7.78,-3.1],l:[10,1,-28]},
   {t:62,p:[0,7.78,-3.1],l:[0,29,-48]},
   {t:70,p:[0,7.78,-3.1],l:[0,8,-74]},
   {t:80,p:[0,7.78,-3.1],l:[0,.5,-100]}
@@ -278,8 +278,8 @@ export function updateWorld(t,dt,manualNight=false){
     b.g.position.x=-36+i*5.2+flight*(18+i*1.4);
     b.g.position.y=24+Math.sin(t*.75+b.phase)*1.6;
     b.g.position.z=-47-i*1.4+Math.cos(t*.3+b.phase)*2;
-    b.left.rotation.z=Math.sin(t*5+b.phase)*.48;
-    b.right.rotation.z=-Math.sin(t*5+b.phase)*.48;
+    b.left.rotation.x=Math.sin(t*5+b.phase)*.48;
+    b.right.rotation.x=-Math.sin(t*5+b.phase)*.48;
   });
   const arr=rainGeo.attributes.position.array;
   for(let i=0;i<rainCount;i++){const k=i*6;arr[k+1]-=dt*20;arr[k+4]-=dt*20;if(arr[k+1]<0){const y=35+Math.random()*12;arr[k+1]=y;arr[k+4]=y-.75;}}
