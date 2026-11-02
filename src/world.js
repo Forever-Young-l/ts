@@ -145,7 +145,7 @@ function addWallPanels(width, depth, baseY, height, centerZ, options = {}) {
 }
 
 function addLevel(baseY, width, depth, columnHeight, roofBase, roofLevels, centerZ, options = {}) {
-  fillLayer(-Math.floor(width / 2), Math.floor(width / 2), centerZ - Math.floor(depth / 2), centerZ + Math.floor(depth / 2), baseY, [palette.wood, palette.woodDark, palette.woodLight], .5, 1, 1);
+  fillLayer(-Math.floor(width / 2), Math.floor(width / 2), centerZ - Math.floor(depth / 2), centerZ + Math.floor(depth / 2), baseY, [palette.wood[0], palette.woodDark, palette.woodLight], .5, 1, 1);
 
   const xs = [];
   for (let x = -Math.floor(width / 2) + 1; x <= Math.floor(width / 2) - 1; x += 4) xs.push(x);
