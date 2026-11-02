@@ -1,3 +1,4 @@
+import * as THREE from 'three';
 import {
   renderer, camera, resizeRenderer, resetCamera, getGroundHeight,
   updateWorld, renderWorld
