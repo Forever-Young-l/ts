@@ -213,6 +213,8 @@ function addStairFlight(){
   addTube(stair,Array.from({length:10},(_,i)=>[1.1,.72+i*.5,5.7-i*.57]),.075,M.timber,30);
 }
 addStairFlight();
+addBox(pavilion,-6.25,5.15,-4.72,3.25,.18,1.72,M.stone,'登阁廊桥');
+addBox(pavilion,-6.25,5.29,-4.72,3.25,.08,1.72,M.timber,'廊桥木面');
 
 function makePlaque(){
   const c=document.createElement('canvas');c.width=1024;c.height=256;const ctx=c.getContext('2d');
@@ -342,8 +344,8 @@ const KEYFRAMES=[
  {t:0,p:[0,1.68,10],l:[0,2.7,-35]},
  {t:7,p:[0,1.68,6],l:[-1,2.5,-38]},
  {t:13,p:[-4.2,2.9,4.5],l:[-8,4,-28]},
- {t:20,p:[-7.1,6.65,.3],l:[-9,7.3,-35]},
- {t:27,p:[-3.2,6.65,-1],l:[-3,7.1,-72]},
+ {t:20,p:[-7.1,6.65,-2.8],l:[-9,7.3,-35]},
+ {t:27,p:[-3.2,6.65,-2.2],l:[-3,7.1,-72]},
  {t:34,p:[0,6.65,-1.1],l:[-10,12,-120]},
  {t:42,p:[0,6.65,-1.1],l:[0,6.2,-145]},
  {t:53,p:[0,6.65,-1.1],l:[10,-.2,-58]},
@@ -389,7 +391,7 @@ export function updateWorld(t,dt,manualNight=false){
   trees.forEach((tree,i)=>{tree.rotation.z=Math.sin(t*.38+i)*.012;});
   boat.group.position.x=-34+clamp((t-42)/16,0,1)*67;boat.group.position.z=-55+Math.sin(t*.18)*.8;
   boat.group.position.y=-.92+Math.sin(t*.9)*.045;boat.group.rotation.y=Math.sin(t*.14)*.025;boat.lamp.group.rotation.z=Math.sin(t*1.2)*.035;
-  birds.forEach((b,i)=>{const flight=clamp((t-24)/35,0,1);b.group.position.x=b.startX+flight*(i===0?42:28);b.group.position.y=b.startY+Math.sin(t*.7+b.phase)*(i===0?1.5:.9);b.group.position.z=b.startZ+Math.cos(t*.26+b.phase)*2;b.left.rotation.z=Math.sin(t*4.6+b.phase)*.42;b.right.rotation.z=-Math.sin(t*4.6+b.phase)*.42;});
+  birds.forEach((b,i)=>{const flight=clamp((t-24)/35,0,1);b.group.position.x=b.startX+flight*(i===0?42:28);b.group.position.y=b.startY+Math.sin(t*.7+b.phase)*(i===0?1.5:.9);b.group.position.z=b.startZ+Math.cos(t*.26+b.phase)*2;b.left.rotation.x=Math.sin(t*4.6+b.phase)*.42;b.right.rotation.x=-Math.sin(t*4.6+b.phase)*.42;});
   const arr=rainGeo.attributes.position.array;
   for(let i=0;i<rainCount;i++){const k=i*6;arr[k+1]-=dt*16;arr[k+4]-=dt*16;if(arr[k+1]<0){const y=29+seeded(i+Math.floor(t*2))*12;arr[k+1]=y;arr[k+4]=y-.7;}}
   rainGeo.attributes.position.needsUpdate=true;
