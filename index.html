@@ -44,6 +44,8 @@ button{font:inherit}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 #boot-error{position:fixed;z-index:20;left:50%;top:50%;transform:translate(-50%,-50%);width:min(520px,calc(100vw - 32px));padding:18px 20px;background:rgba(37,25,22,.96);border:1px solid #d5aa73;color:#fff0d2;font-size:13px;line-height:1.8;text-align:center;box-shadow:0 12px 50px rgba(0,0,0,.4)}
 .touch-pad{display:none;position:fixed;z-index:4;left:18px;bottom:76px;grid-template-columns:repeat(3,46px);grid-template-rows:repeat(2,46px);gap:5px}
+.vertical-pad{display:none;position:fixed;z-index:4;right:18px;bottom:76px;flex-direction:column;gap:6px}
+.vertical-pad .touch-btn{width:46px;height:46px;font-size:13px}
 .touch-btn{border:1px solid rgba(241,222,184,.4);background:rgba(17,31,26,.46);color:#fff0d2;font:17px Arial,sans-serif;touch-action:none;user-select:none}
 .touch-btn.pressed{background:rgba(143,81,53,.85)}
 .touch-btn.up{grid-column:2;grid-row:1}.touch-btn.left{grid-column:1;grid-row:2}.touch-btn.down{grid-column:2;grid-row:2}.touch-btn.right{grid-column:3;grid-row:2}
@@ -51,7 +53,7 @@ button{font:inherit}
  .topbar{padding:12px 12px}.brand-title{font-size:12px}.brand-sub{font-size:8px}.brand-mark{width:28px;height:28px}
  .top-actions{gap:5px}.mode{display:none}.ui-btn{padding:8px 9px;font-size:10px}
  .bottom-bar{padding:18px 14px 14px}.hints{display:none}.scene-name{font-size:11px}#coords{font-size:9px}
- .touch-pad{display:grid}.toast{bottom:138px;max-width:calc(100vw - 30px);white-space:normal;text-align:center}
+ .touch-pad{display:grid}.vertical-pad{display:flex}.toast{bottom:138px;max-width:calc(100vw - 30px);white-space:normal;text-align:center}
  .intro p{font-size:11px}.enter-btn{padding:12px 26px}
 }
 </style>
@@ -66,6 +68,7 @@ button{font:inherit}
   <div class="top-actions">
     <span class="mode" id="mode">自由探索</span>
     <button class="ui-btn" id="tour">自动导览</button>
+    <button class="ui-btn" id="view-toggle">上帝视角</button>
     <button class="ui-btn" id="reset">重置视角</button>
     <button class="ui-btn" id="fullscreen">全屏</button>
   </div>
@@ -73,7 +76,7 @@ button{font:inherit}
 <div class="reticle"></div>
 <footer class="bottom-bar">
   <div><div class="scene-name">江天一阁 · 方块江南</div><div class="scene-sub">云销雨霁 · 落霞秋水</div></div>
-  <div class="hints">W A S D 移动　·　鼠标环顾　·　Shift 奔跑　·　Space 跳跃</div>
+  <div class="hints" id="hints">W A S D 移动　·　鼠标环顾　·　Shift 奔跑　·　Space 跳跃</div>
   <div id="coords">位置 0 / 38</div>
 </footer>
 <div class="touch-pad" aria-label="移动控制">
@@ -81,6 +84,10 @@ button{font:inherit}
   <button class="touch-btn left" data-key="a">←</button>
   <button class="touch-btn down" data-key="s">↓</button>
   <button class="touch-btn right" data-key="d">→</button>
+</div>
+<div class="vertical-pad" aria-label="飞行升降">
+  <button class="touch-btn" data-key="e">升</button>
+  <button class="touch-btn" data-key="c">降</button>
 </div>
 <div class="intro" id="intro">
   <small>VOXEL WORLD · JIANGNAN</small>
@@ -91,7 +98,7 @@ button{font:inherit}
 <div class="toast" id="toast"></div>
 <div id="boot-error" role="alert" hidden></div>
 <script type="module">
-import('./src/app.js?v=voxel-fix-2').catch(error => {
+import('./src/app.js?v=voxel-godview-1').catch(error => {
   console.error('Voxel world failed to start:', error);
   const panel = document.getElementById('boot-error');
   panel.hidden = false;
