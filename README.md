@@ -1,41 +1,47 @@
 # 江天一阁 · 走进《滕王阁序》
 
-A first-person, code-built Three.js poetic journey inspired by Wang Bo's Preface to the Pavilion of Prince Teng. The architecture uses a refined voxel / timber hybrid; river, clouds, mist, birds, boat, lanterns, rain and dusk are animated procedurally.
+A cinematic first-person Three.js journey inspired by Wang Bo's Preface to the Pavilion of Prince Teng. The visual direction is a restrained, painterly interpretation of Tang-era Jiangnan: real architectural proportions, curved tiled eaves, lacquered timber, aged stone, atmospheric distance, a broad river and a carefully controlled dusk palette.
+
+## Art direction
+
+- No block-world treatment. Architectural volumes use cylindrical vermilion columns, timber joinery, layered dougong brackets, custom curved hip-roof surfaces, glazed-tile textures, stone plinths and carved details.
+- The voxel influence is reduced to occasional structural rhythm and crisp silhouettes; it is not the dominant visual language.
+- Palette: ink jade, old cinnabar, weathered timber, river slate, dusk rose, pale bronze and parchment.
+- Composition: first-person eye-level camera, framed by pavilion eaves and columns, then opening to the river and distant mountain layers.
+- Atmosphere: procedural sky gradient, drifting cloud veils, layered mountain silhouettes, water shimmer, fading rain, reed movement, egret and geese flight, lantern light.
+- No modern buildings, traffic, electric fixtures, contemporary clothing, logos or technology in the poetic world.
 
 ## Experience
 
-- 80-second automatic first-person camera journey across six poem chapters
-- Free-roam mode (W/A/S/D + mouse pointer lock)
-- Dynamic rain clearing, moving cloud layers, river shimmer, drifting fishing boat, flying egret and geese, swaying reeds and flickering lanterns
-- Original plucked-string ambient score generated in Web Audio
-- Chinese voice narration preview using the browser's available zh-CN speech voice; it prefers a male-labelled voice where available
-- Optional upload of a complete recorded male narration track and a licensed original music track (MP3/WAV)
-- 1080 × 1920 portrait composition captured from a clean scene canvas
-- Browser recording to WebM; import into Jianying / CapCut to export MP4
+- 80-second automatic camera journey across six poem chapters.
+- Free-roam mode (W/A/S/D + mouse pointer lock).
+- A layered pavilion with three roof tiers, carved timber brackets, stone terrace, a side stair and upper gallery.
+- Animated dusk-to-night transition and river reflections.
+- A drifting traditional covered fishing boat, birds, clouds, rain and reeds.
+- Original Web Audio plucked-string ambience.
+- Browser Chinese voice preview; optional upload of a professionally recorded male narration track and licensed/original music track.
+- Clean 1080 × 1920, 30 fps portrait recording to WebM.
 
 ## Run locally
 
-Run a local static server with Python's http.server on port 8000, then open localhost:8000.
+Run a local static server with Python's http.server on port 8000, then open localhost:8000. The page loads Three.js 0.160 from jsDelivr, so the browser needs network access.
 
-The page loads Three.js 0.160 from jsDelivr, so the browser needs network access for the library.
+## Storyboard
 
-## Storyboard and narration
-
-The timed six-chapter shot list and narration cues are in docs/shotlist.md.
+The six-chapter timed shot list and narration cues are in docs/shotlist.md.
 
 ## Record a film
 
 1. Open the page in desktop Chrome or Edge.
-2. Press the record button.
-3. In the browser capture picker, select this tab and enable Share tab audio. This captures browser speech synthesis with the original score.
-4. The 80-second camera path starts automatically. The video is recorded as a portrait 1080 × 1920 WebM.
-5. For release-quality sound, upload a professionally recorded male narration track and a licensed/original guqin-xiao music track before recording. Both are mixed into the recorded audio. Without uploads, the app uses browser speech synthesis and its procedural plucked-string ambience.
-6. Import the WebM into Jianying / CapCut and export H.264 MP4 at 1080 × 1920, 30 fps.
+2. For a release-quality result, upload a recorded male narration track and an original/licensed guqin-xiao music track.
+3. Press the record button. If relying on browser speech synthesis, select this tab in the capture picker and enable Share tab audio.
+4. The 80-second camera path runs automatically and records a 1080 × 1920 portrait WebM.
+5. Import the WebM into Jianying / CapCut and export H.264 MP4 at 1080 × 1920, 30 fps.
 
-## Narration notes
+## Narration note
 
-Browser speech synthesis depends on installed voices and operating system. The app prefers a Chinese voice whose name suggests a male voice, but voice gender and timbre cannot be guaranteed across devices. For a release-quality male performance, upload a licensed or self-recorded full narration track. The poem lines and cue timing are already aligned to the camera timeline.
+Browser speech synthesis depends on installed system voices. It can preview the poem but cannot guarantee a mature male timbre. A professionally recorded voice track is recommended for the final film.
 
-## Creative and historical note
+## Historical note
 
-This is a stylized poetic interpretation, not a measured architectural reconstruction of the present-day Tengwang Pavilion. The scene intentionally avoids modern objects and contemporary signage.
+This is a poetic, stylized reconstruction rather than a measured survey of the present-day Tengwang Pavilion. Architectural details are composed to serve the camera journey and should not be read as a conservation-grade historical model.
