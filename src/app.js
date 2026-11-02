@@ -23,30 +23,82 @@ function updateCaption(t){
     $('status').textContent='诗境 '+String(idx+1).padStart(2,'0')+' / 六';
     $('chapter').textContent=c.title;$('verse').textContent=c.verse;$('note').textContent=c.note;
     $('chapter-live').textContent=c.title;$('verse-live').textContent=c.verse;$('note-live').textContent=c.note;
+    document.querySelectorAll('.chapter-dot').forEach((dot,i)=>dot.classList.toggle('active',i<=idx));
     if(cinematic&&narratorEnabled&&!audio.hasVoiceFile)audio.speak(c.verse);
     audio.setChapter(idx);
   }
-  $('progress').style.width=(t/DURATION*100)+'%';
+  const progress=$('progress');if(progress)progress.style.width=(t/DURATION*100)+'%';
   $('progress-live').style.width=(t/DURATION*100)+'%';
 }
+const grainCanvas=document.createElement('canvas');
+grainCanvas.width=160;grainCanvas.height=160;
+const grainCtx=grainCanvas.getContext('2d');
+const grainImage=grainCtx.createImageData(160,160);
+for(let i=0;i<grainImage.data.length;i+=4){
+  const n=100+Math.random()*100;
+  grainImage.data[i]=n;grainImage.data[i+1]=n;grainImage.data[i+2]=n;grainImage.data[i+3]=34;
+}
+grainCtx.putImageData(grainImage,0,0);
+const grainPattern=recordCtx.createPattern(grainCanvas,'repeat');
+
 function drawRecordFrame(t){
-  const ctx=recordCtx;ctx.drawImage(renderer.domElement,0,0,WIDTH,HEIGHT);
-  const shade=ctx.createLinearGradient(0,1200,0,HEIGHT);
-  shade.addColorStop(0,'rgba(9,20,23,0)');shade.addColorStop(.42,'rgba(9,20,23,.24)');shade.addColorStop(1,'rgba(9,20,23,.78)');
+  const ctx=recordCtx;
+  ctx.drawImage(renderer.domElement,0,0,WIDTH,HEIGHT);
+
+  const vignette=ctx.createRadialGradient(WIDTH*.5,HEIGHT*.43,HEIGHT*.18,WIDTH*.5,HEIGHT*.48,HEIGHT*.72);
+  vignette.addColorStop(0,'rgba(5,11,11,0)');
+  vignette.addColorStop(.72,'rgba(5,11,11,.12)');
+  vignette.addColorStop(1,'rgba(5,11,11,.52)');
+  ctx.fillStyle=vignette;ctx.fillRect(0,0,WIDTH,HEIGHT);
+
+  const shade=ctx.createLinearGradient(0,1320,0,HEIGHT);
+  shade.addColorStop(0,'rgba(8,15,15,0)');
+  shade.addColorStop(.26,'rgba(8,15,15,.18)');
+  shade.addColorStop(1,'rgba(8,15,15,.78)');
   ctx.fillStyle=shade;ctx.fillRect(0,0,WIDTH,HEIGHT);
+
   const c=CHAPTERS[chapterIndex(t)];
-  ctx.textAlign='center';ctx.textBaseline='middle';ctx.shadowColor='rgba(0,0,0,.65)';ctx.shadowBlur=24;
-  ctx.fillStyle='rgba(231,211,169,.88)';ctx.font='28px "KaiTi","STKaiti","Songti SC",serif';
-  ctx.fillText('王 勃 · 滕 王 阁 序',WIDTH/2,145);
-  ctx.fillStyle='#f4e7c8';ctx.font='bold 51px "KaiTi","STKaiti","Songti SC",serif';
-  if(c.verse.length>15){
+  ctx.save();
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.shadowColor='rgba(0,0,0,.7)';ctx.shadowBlur=20;
+  ctx.fillStyle='rgba(232,216,181,.82)';
+  ctx.font='25px "Noto Serif SC","Songti SC","STSong",serif';
+  ctx.fillText('王 勃  ·  滕 王 阁 序',WIDTH/2,126);
+  ctx.strokeStyle='rgba(215,185,129,.5)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(390,165);ctx.lineTo(690,165);ctx.stroke();
+
+  ctx.fillStyle='rgba(218,185,126,.94)';
+  ctx.font='25px "Noto Serif SC","Songti SC","STSong",serif';
+  ctx.fillText(c.title,WIDTH/2,1452);
+
+  const long=c.verse.length>13;
+  const size=c.verse.length>17?43:(long?46:54);
+  ctx.fillStyle='#f2e7d0';
+  ctx.font='bold '+size+'px "Noto Serif SC","Songti SC","STSong",serif';
+  if(c.verse.length>13){
     const split=c.verse.indexOf('，')>0?c.verse.indexOf('，')+1:Math.ceil(c.verse.length/2);
-    ctx.fillText(c.verse.slice(0,split),WIDTH/2,1575);ctx.fillText(c.verse.slice(split),WIDTH/2,1650);
-  }else ctx.fillText(c.verse,WIDTH/2,1610);
-  ctx.shadowBlur=0;ctx.fillStyle='rgba(226,207,167,.72)';ctx.font='25px "KaiTi","STKaiti","Songti SC",serif';
-  ctx.fillText(c.note,WIDTH/2,1735);
-  ctx.strokeStyle='rgba(218,188,126,.55)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(180,1820);ctx.lineTo(900,1820);ctx.stroke();
-  ctx.fillStyle='rgba(218,188,126,.7)';ctx.font='20px serif';ctx.fillText('江 天 一 阁 · 秋 水 长 天',WIDTH/2,1860);
+    ctx.fillText(c.verse.slice(0,split),WIDTH/2,1540);
+    ctx.fillText(c.verse.slice(split),WIDTH/2,1610);
+  }else{
+    ctx.fillText(c.verse,WIDTH/2,1572);
+  }
+  ctx.shadowBlur=0;
+  ctx.fillStyle='rgba(225,211,184,.76)';
+  ctx.font='24px "Noto Serif SC","Songti SC","STSong",serif';
+  ctx.fillText(c.note,WIDTH/2,1700);
+
+  ctx.strokeStyle='rgba(211,181,126,.55)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(170,1792);ctx.lineTo(910,1792);ctx.stroke();
+  ctx.fillStyle='rgba(222,202,161,.7)';
+  ctx.font='18px "Noto Serif SC","Songti SC","STSong",serif';
+  ctx.fillText('江 天 一 阁  ·  秋 水 长 天',WIDTH/2,1840);
+
+  ctx.fillStyle='rgba(126,47,39,.92)';ctx.fillRect(944,1808,58,58);
+  ctx.strokeStyle='rgba(235,211,172,.82)';ctx.lineWidth=2;ctx.strokeRect(950,1814,46,46);
+  ctx.fillStyle='#ead9b9';ctx.font='28px KaiTi,STKaiti,serif';ctx.fillText('诗',973,1838);
+
+  ctx.globalAlpha=.055;ctx.fillStyle=grainPattern;ctx.fillRect(0,0,WIDTH,HEIGHT);
+  ctx.restore();
 }
 function updateManual(dt){
   const speed=6.5*dt,forward=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw)),right=new THREE.Vector3(Math.cos(yaw),0,-Math.sin(yaw));
@@ -63,7 +115,7 @@ document.addEventListener('pointerlockchange',()=>{if(!document.pointerLockEleme
 
 async function startJourney(){
   await audio.start();intro.classList.add('hidden');manual=false;manualNight=false;cinematic=true;finished=false;elapsed=0;lastChapter=-1;startedAt=performance.now();audio.resumeVoice();
-  camera.position.set(0,1.72,31);updateCaption(0);if(narratorEnabled)audio.startVoiceTrack();audio.startMusicTrack();
+  camera.position.set(0,1.68,10);updateCaption(0);if(narratorEnabled)audio.startVoiceTrack();audio.startMusicTrack();
   playBtn.textContent='暂停诗境';toast('诗卷已展开，请随镜而行。');
 }
 function pauseJourney(){
@@ -74,7 +126,7 @@ function restartJourney(){audio.stopVoice();startJourney();}
 playBtn.addEventListener('click',()=>{if(cinematic)pauseJourney();else if(!finished&&elapsed>0)pauseJourney();else startJourney();});
 $('close-intro').addEventListener('click',startJourney);
 $('restart').addEventListener('click',restartJourney);
-$('roam').addEventListener('click',()=>{cinematic=false;manual=true;finished=false;intro.classList.add('hidden');audio.start();camera.position.set(0,1.72,25);yaw=0;pitch=0;toast('漫游已开启：W、A、S、D 行走，鼠标转身。');});
+$('roam').addEventListener('click',()=>{cinematic=false;manual=true;finished=false;intro.classList.add('hidden');audio.start();camera.position.set(0,1.68,10);yaw=0;pitch=0;toast('漫游已开启：W、A、S、D 行走，鼠标转身。');});
 $('day').addEventListener('click',()=>{manualNight=!manualNight;toast(manualNight?'夜色已至。':'霞光重临。');});
 $('narrator').addEventListener('click',()=>{narratorEnabled=!narratorEnabled;$('narrator').textContent=narratorEnabled?'诵读：开':'诵读：静';if(!narratorEnabled){audio.stopSpeech();audio.voiceElement?.pause();}else if(cinematic&&audio.hasVoiceFile)audio.voiceElement?.play().catch(()=>{});});
 $('voice-file').addEventListener('change',async e=>{const file=e.target.files&&e.target.files[0];if(file){await audio.loadVoiceFile(file);toast('已载入男声旁白：'+file.name);}});
