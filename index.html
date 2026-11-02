@@ -1,91 +1,84 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>方块世界 · 滕王阁</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#201b18">
+<title>江天一阁 · 走进《滕王阁序》</title>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
 <style>
-:root{--ink:#f2f1e8;--muted:#b6c8bd;--gold:#e6c887;--glass:rgba(10,28,31,.72);--line:rgba(235,220,177,.22)}
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#87b6b2;color:var(--ink);font-family:Inter,"Microsoft YaHei",sans-serif}
-#world{position:fixed;inset:0}canvas{display:block}
-.hud{position:fixed;inset:0;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:24px}
-.top{display:flex;justify-content:space-between;align-items:flex-start;gap:18px}.brand{pointer-events:auto}.eyebrow{font-size:10px;letter-spacing:.26em;color:var(--gold);text-transform:uppercase}.brand h1{font-family:Georgia,"Songti SC",serif;font-weight:500;font-size:clamp(23px,3vw,38px);letter-spacing:.08em;margin:8px 0 4px}.brand p{font-size:12px;color:#e1e8d9;margin:0;letter-spacing:.1em}
-.pill,.panel{background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(16px);box-shadow:0 16px 50px #102a2b30;border-radius:14px}.status{padding:11px 15px;font-size:11px;color:#d5e3d8;letter-spacing:.12em}.status b{color:#d6d28b;font-weight:500}
-.bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:16px}.info{pointer-events:auto;max-width:390px;padding:18px 20px}.info small{color:var(--gold);letter-spacing:.2em;font-size:10px}.info h2{font:500 22px Georgia,"Songti SC",serif;margin:8px 0}.info p{font-size:12px;line-height:1.8;color:#c5d4cb;margin:0}.controls{pointer-events:auto;display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;max-width:520px}.btn{border:1px solid var(--line);background:var(--glass);color:var(--ink);padding:11px 14px;border-radius:10px;cursor:pointer;font-size:11px;letter-spacing:.08em;backdrop-filter:blur(12px);transition:.2s}.btn:hover,.btn.active{background:#d7bd7c;color:#1c2b29;border-color:#d7bd7c}.hint{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);font-size:11px;color:#fff;background:#102b2bb0;padding:9px 13px;border-radius:99px;pointer-events:none;opacity:.88;transition:opacity 1s}.crosshair{position:fixed;left:50%;top:50%;width:8px;height:8px;border:1px solid #fff9;border-radius:50%;transform:translate(-50%,-50%);pointer-events:none}
-@media(max-width:700px){.hud{padding:15px}.status{display:none}.bottom{align-items:stretch;flex-direction:column}.info{max-width:none}.controls{justify-content:flex-start}.brand p{max-width:240px;line-height:1.6}}
+:root{--paper:#e8d9b8;--paper2:#d5c39b;--gold:#b68b4f;--red:#7b3028}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#1c201d;color:var(--paper);font-family:"LXGW WenKai TC","KaiTi","STKaiti","Songti SC",serif}
+body{background:radial-gradient(ellipse at 50% 46%,#3b4139 0%,#1c211e 56%,#121614 100%)}
+.workbench{height:100%;width:100%;display:flex;align-items:center;justify-content:center;gap:26px;padding:20px}
+.side{width:286px;max-width:286px;display:flex;flex-direction:column;gap:16px}
+.brand{border-bottom:1px solid rgba(207,177,122,.36);padding:0 0 15px}
+.brand .seal{display:inline-flex;width:35px;height:35px;border:1px solid #a74c3b;color:#c46c52;align-items:center;justify-content:center;font-size:18px;margin-right:8px;vertical-align:middle}
+.brand .small{font-size:11px;letter-spacing:.22em;color:#c6a875}
+.brand h1{font-weight:400;font-size:27px;letter-spacing:.08em;margin:10px 0 4px;color:#f0dfbd}
+.brand p{margin:0;color:#b6a17d;font-size:12px;letter-spacing:.08em}
+.scroll{position:relative;background:linear-gradient(135deg,#e8d9b8,#d9c69e);color:#3d2b1e;border:1px solid #a98b5d;box-shadow:0 15px 34px #0006;padding:17px}
+.scroll:before,.scroll:after{content:"";position:absolute;left:-5px;right:-5px;height:7px;background:#8b6743;border:1px solid #c2a476}
+.scroll:before{top:-4px}.scroll:after{bottom:-4px}
+.scroll h2{font-weight:400;font-size:18px;margin:0 0 10px;color:#633b2c}
+.scroll p{font-size:13px;line-height:1.8;margin:0;color:#514131}
+.verse-card{min-height:116px}.verse-card .verse{font-size:19px;line-height:1.7;color:#4c3025}.verse-card .note{font-size:11px;color:#92764e;margin-top:8px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ancient-btn{border:1px solid #98734a;background:linear-gradient(#e8d7b1,#cdb68a);color:#3b2a1e;padding:11px 8px;font:15px "LXGW WenKai TC","KaiTi",serif;cursor:pointer;box-shadow:inset 0 1px #f6e9c9,0 3px 0 #755536;transition:.15s}
+.ancient-btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.ancient-btn.primary{background:linear-gradient(#a34c3b,#6f2d27);color:#f0dfbd;border-color:#c28c64;box-shadow:inset 0 1px #c98b6d,0 3px 0 #48231e}
+.ancient-btn.active{outline:2px solid #d5b77d;outline-offset:2px}.ancient-btn.wide{grid-column:1/-1}
+.file-row{font-size:12px;color:#c7b28d;line-height:1.7}.file-row input{width:100%;margin-top:6px;color:#d6c49d;font:11px serif}
+.hint{font-size:11px;line-height:1.8;color:#9f947a;border-top:1px solid #756447;padding-top:10px}
+.frame-wrap{position:relative;height:min(94vh,177.777vw);width:min(52.9vh,52vw);aspect-ratio:9/16;border:1px solid #b18d58;box-shadow:0 0 0 7px #29241d,0 0 0 8px #8c7048,0 24px 80px #0009;overflow:hidden;background:#24383a}
+#world{position:absolute;inset:0}.scene-canvas{display:block;width:100%;height:100%}
+.frame-vignette{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(12,18,19,.24),transparent 20%,transparent 69%,rgba(10,16,17,.36));box-shadow:inset 0 0 85px rgba(13,17,17,.42)}
+.frame-top{position:absolute;top:26px;left:0;right:0;text-align:center;color:rgba(241,220,177,.83);font-size:11px;letter-spacing:.34em;text-shadow:0 2px 10px #000}
+.frame-caption{position:absolute;left:25px;right:25px;bottom:78px;text-align:center;text-shadow:0 2px 12px #000,0 0 24px #000}
+.frame-caption .chapter{font-size:12px;color:#dfc18a;letter-spacing:.22em;margin-bottom:12px}
+.frame-caption .verse{font-size:23px;line-height:1.7;color:#f5e9cc}.frame-caption .note{font-size:12px;color:#d5c39b;margin-top:7px}
+.frame-progress{position:absolute;bottom:24px;left:28px;right:28px;height:2px;background:#e5d3a344}.frame-progress span{display:block;width:0;height:100%;background:#d7b67a;box-shadow:0 0 8px #e2c98e}
+.intro{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;background:linear-gradient(180deg,rgba(13,24,27,.48),rgba(12,20,20,.65));transition:opacity .8s}
+.intro.hidden{opacity:0;pointer-events:none}.intro .intro-small{font-size:12px;letter-spacing:.38em;color:#ddc28f}
+.intro h2{font-size:42px;font-weight:400;letter-spacing:.14em;margin:20px 0 10px;color:#f3e4c5;text-shadow:0 3px 24px #000}
+.intro p{font-size:14px;letter-spacing:.16em;color:#e0cfaa;margin:0 0 34px}
+.intro button{font:19px "LXGW WenKai TC","KaiTi",serif;letter-spacing:.16em;color:#f1dfbd;background:linear-gradient(#9e4d3b,#6d2d27);border:1px solid #c79a69;padding:13px 33px;box-shadow:0 4px 0 #43231d,0 12px 25px #0008;cursor:pointer}
+.toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,18px);opacity:0;pointer-events:none;background:#e5d2aa;color:#432d20;border:1px solid #a98757;padding:10px 18px;font-size:13px;box-shadow:0 5px 24px #0006;transition:.3s;z-index:10;white-space:nowrap}
+.toast.show{opacity:1;transform:translate(-50%,0)}.mini-title{font-size:11px;color:#c9ad7d;letter-spacing:.22em}
+.progress-label{display:flex;justify-content:space-between;color:#ad9873;font-size:11px;margin-top:9px}
+@media(max-width:900px){
+ .workbench{padding:0;display:block}.frame-wrap{height:100dvh;width:56.25dvh;max-width:100vw;margin:0 auto;border:0;box-shadow:none}
+ .side{position:absolute;z-index:4;left:10px;right:10px;bottom:10px;width:auto;max-width:none;display:grid;grid-template-columns:1fr;gap:7px;pointer-events:none}
+ .brand,.scroll,.hint{display:none}.actions{pointer-events:auto;grid-template-columns:repeat(3,1fr);gap:6px}
+ .ancient-btn{padding:8px 4px;font-size:13px;background:rgba(224,207,169,.92)}.ancient-btn.primary{background:rgba(130,55,43,.96)}
+ .file-row{pointer-events:auto;background:rgba(30,29,25,.84);padding:6px 10px}.frame-caption{bottom:118px}
+}
+@media(max-width:520px){.frame-wrap{width:100vw;height:100dvh}.frame-caption .verse{font-size:20px}.intro h2{font-size:34px}}
 </style>
 </head>
 <body>
-<div id="world"></div>
-<div class="hud">
- <div class="top"><div class="brand"><div class="eyebrow">VOXEL JIANGNAN · NANCHANG</div><h1>方块世界 · 滕王阁</h1><p>落霞与孤鹜齐飞，秋水共长天一色</p></div><div class="pill status"><b>●</b> 场景已载入　/　漫游模式</div></div>
- <div class="bottom">
-  <section class="panel info"><small>LANDMARK 01 / GANJIANG RIVER</small><h2>江天一阁 · 滕王阁</h2><p>以方块积木重构江南名楼。沿江而立，层檐叠起；你可以环绕建筑、漫游江岸，在像素山水之间寻找自己的观景角度。</p></section>
-  <nav class="controls"><button class="btn active" id="orbit">环绕视角</button><button class="btn" id="walk">漫游模式</button><button class="btn" id="day">昼夜切换</button><button class="btn" id="reset">重置视角</button></nav>
- </div>
-</div>
-<div class="hint" id="hint">拖动旋转 · 滚轮缩放 · WASD 移动</div><div class="crosshair"></div>
-<script type="module">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
-import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js';
-const mount=document.querySelector('#world');
-const scene=new THREE.Scene();scene.background=new THREE.Color('#91c2c0');scene.fog=new THREE.Fog('#91c2c0',45,115);
-const camera=new THREE.PerspectiveCamera(48,innerWidth/innerHeight,.1,250);camera.position.set(27,22,34);
-const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;mount.appendChild(renderer.domElement);
-const controls=new OrbitControls(camera,renderer.domElement);controls.target.set(0,7,0);controls.enableDamping=true;controls.maxPolarAngle=Math.PI*.48;controls.minDistance=12;controls.maxDistance=72;
-scene.add(new THREE.HemisphereLight('#e6f5e6','#64766b',2.0));
-const sun=new THREE.DirectionalLight('#ffe1a8',3.1);sun.position.set(-24,38,18);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-45;sun.shadow.camera.right=45;sun.shadow.camera.top=45;sun.shadow.camera.bottom=-45;scene.add(sun);
-const mat=(c)=>new THREE.MeshStandardMaterial({color:c,roughness:.88});
-const grass=mat('#6d9a62'),grass2=mat('#83a96b'),earth=mat('#795c43'),stone=mat('#9b9c88'),stoneDark=mat('#606f69'),water=mat('#397e83'),wood=mat('#875035'),woodLight=mat('#b87942'),red=mat('#9c3f32'),roof=mat('#354d48'),roofLight=mat('#587267'),gold=mat('#d9b76f'),leaf=mat('#477451'),leaf2=mat('#668b54');
-const geo=new THREE.BoxGeometry(1,1,1);
-function block(x,y,z,sx,sy,sz,m){const o=new THREE.Mesh(geo,m);o.position.set(x,y,z);o.scale.set(sx,sy,sz);o.castShadow=true;o.receiveShadow=true;scene.add(o);return o}
-function slab(x,y,z,sx,sz,m=grass){return block(x,y,z,sx,.8,sz,m)}
-// island and river
-slab(0,-.7,0,72,58,earth);slab(0,-.15,0,70,56,grass);
-block(0,-.2,-39,180,.5,30,water);block(0,-.2,39,180,.5,30,water);
-for(let i=0;i<24;i++){let x=-33+i*2.8;block(x,.08,-25+Math.sin(i*.7)*1.8,1.4,.12,1.1,grass2)}
-// pavilion foundation
-block(0,.55,0,19,1.4,15,stoneDark);block(0,1.25,0,17.8,.6,13.8,stone);
-for(let x=-8;x<=8;x+=2)for(let z=-6;z<=6;z+=2)block(x,1.65,z,.22,.45,.22,stoneDark);
-// tower tiers: broad timber body, red columns, green tiled roofs, raised corners
-function roofTier(y,w,d){block(0,y,0,w,.55,d,roof);block(0,y+.22,0,w*.82,.14,d*.82,roofLight);
- for(let x of [-1,1])for(let z of [-1,1]){let e=block(x*(w/2+.7),y+.38,z*(d/2+.7),1.7,.22,1.7,roofLight);e.rotation.z=x*.12;e.rotation.x=-z*.12}
- block(0,y+.62,0,.65,.38,.65,gold);
-}
-function floorLevel(y,w,d,h){block(0,y+h/2,0,w,h,d,wood);block(0,y+.2,0,w+.6,.25,d+.6,red);
- for(let x=-w/2+.7;x<w/2;x+=2.1)for(let z of [-d/2+.22,d/2-.22])block(x,y+h/2,z,.24,h,.24,red);
- for(let z=-d/2+.7;z<d/2;z+=2.1)for(let x of [-w/2+.22,w/2-.22])block(x,y+h/2,z,.24,h,.24,red);
- // window bays
- for(let x=-w/2+1.4;x<w/2-1;x+=2.1)block(x,y+h*.65,0,.9,.85,d+.04,woodLight);
-}
-floorLevel(1.9,13,10,4.2);roofTier(6.4,17,14);
-floorLevel(7.2,10.5,8.5,3.6);roofTier(11.35,14,12);
-floorLevel(12,8,6.5,3.1);roofTier(15.55,11.5,9.5);
-floorLevel(16.2,5.5,4.8,2.5);roofTier(19.05,8.8,7.5);
-block(0,20.1,0,.8,1.1,.8,gold);block(0,20.85,0,.28,.65,.28,gold);
-// front steps and stone path
-for(let i=0;i<7;i++)block(0,.25+i*.08,8+i*1.05,5+i*.45,.35,1.2,stone);
-for(let i=0;i<8;i++)block(0,.25,15+i*1.1,3,.35,1,stone);
-// pagoda side pavilion / lanterns
-for(let x of [-11,11]){block(x,1.2,1,1.1,2.4,1.1,wood);block(x,2.55,1,2,.25,2,roof);block(x,2.95,1,.35,.7,.35,gold)}
-// blocky trees
-function tree(x,z,s=1){block(x,.7*s,z,.9*s,1.4*s,.9*s,wood);for(let j=0;j<3;j++){let size=(3.7-j*.7)*s;block(x,(2+j*1.25)*s,z,size,1.4*s,size,j%2?leaf2:leaf)}block(x,5.2*s,z,1.7*s,1.3*s,1.7*s,leaf2)}
-for(const p of [[-19,-8,1.1],[-24,3,1.3],[-18,15,.9],[20,-10,1.2],[24,6,1.1],[18,17,1.3],[-29,-17,.9],[30,-19,1]])tree(...p);
-// distant city silhouettes
-for(let i=0;i<18;i++){let x=-34+i*4;let h=3+(i*7%8);block(x,h/2,-29,2.5,h,2,stoneDark)}
-// stepping stones and shrubs
-for(let i=0;i<25;i++){let x=Math.sin(i*8.1)*27,z=Math.cos(i*3.7)*22;if(Math.abs(x)>12||Math.abs(z)>12)block(x,.35,z,1.1,.5,1, i%2?grass2:stone)}
-// clouds made of blocks
-const clouds=[];for(let i=0;i<7;i++){let g=new THREE.Group();for(let j=0;j<5;j++){let b=new THREE.Mesh(geo,mat('#e3e8d8'));b.scale.set(2.8,1,2);b.position.set((j-2)*1.8,Math.sin(j)*.4,Math.cos(j)*.4);g.add(b)}g.position.set(-42+i*14,29+(i%3)*3,-34);scene.add(g);clouds.push(g)}
-let night=false,walk=false,keys={};const original={pos:camera.position.clone(),target:controls.target.clone()};
-function toggleDay(){night=!night;scene.background.set(night?'#172c3c':'#91c2c0');scene.fog.color.set(night?'#172c3c':'#91c2c0');sun.intensity=night?.55:3.1;sun.color.set(night?'#8eb8e8':'#ffe1a8');scene.children.forEach(o=>{if(o.isHemisphereLight)o.intensity=night?.65:2});document.querySelector('#day').classList.toggle('active',night)}
-document.querySelector('#day').onclick=toggleDay;
-document.querySelector('#reset').onclick=()=>{camera.position.copy(original.pos);controls.target.copy(original.target);controls.update();walk=false;document.querySelector('#walk').classList.remove('active');document.querySelector('#orbit').classList.add('active')};
-document.querySelector('#orbit').onclick=()=>{walk=false;controls.enabled=true;document.querySelector('#walk').classList.remove('active');document.querySelector('#orbit').classList.add('active')};
-document.querySelector('#walk').onclick=()=>{walk=!walk;controls.enabled=!walk;document.querySelector('#walk').classList.toggle('active',walk);document.querySelector('#orbit').classList.toggle('active',!walk)};
-addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;if(['w','a','s','d',' '].includes(e.key.toLowerCase()))e.preventDefault()});addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
-let prev=performance.now();function animate(t){requestAnimationFrame(animate);let dt=Math.min((t-prev)/1000,.04);prev=t;clouds.forEach((c,i)=>{c.position.x+=dt*(.35+i*.025);if(c.position.x>50)c.position.x=-50});if(walk){let f=(keys.w?1:0)-(keys.s?1:0),r=(keys.d?1:0)-(keys.a?1:0);let v=new THREE.Vector3(r,0,f).normalize().multiplyScalar(dt*9);camera.position.add(v);controls.target.add(v)}controls.update();renderer.render(scene,camera)}requestAnimationFrame(animate);
-addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
-setTimeout(()=>document.querySelector('#hint').style.opacity=0,6500);
-</script>
-</body></html>
+<main class="workbench">
+  <aside class="side">
+    <header class="brand"><span class="seal">诗</span><span class="small">江 南 纪 行 · 诗 境 卷</span><h1>走进《滕王阁序》</h1><p>第一人称 · 秋水长天 · 八十息诗旅</p></header>
+    <section class="scroll verse-card"><div class="mini-title">当前诗境 · <span id="status">诗境 01 / 六</span></div><h2 id="chapter">云销雨霁</h2><div class="verse" id="verse">云销雨霁，彩彻区明</div><div class="note" id="note">檐雨初歇，天光乍开。</div></section>
+    <section class="scroll"><h2>行旅卷轴</h2><p>从檐下入阁，循石阶登临。听雨歇、看云开、随孤鹜远去，最后停在槛外长江之前。</p><div class="progress-label"><span>启程</span><span>归于长江</span></div><div style="height:3px;background:#a68b60;margin-top:8px"><div id="progress" style="height:3px;background:#8b3d30;width:0"></div></div></section>
+    <section class="actions">
+      <button class="ancient-btn primary wide" id="play">启卷入境</button>
+      <button class="ancient-btn" id="record">录制诗境</button><button class="ancient-btn" id="roam">随行漫游</button>
+      <button class="ancient-btn" id="day">昼夜流转</button><button class="ancient-btn" id="listen">试听诵读</button>
+      <button class="ancient-btn" id="narrator">诵读：开</button><button class="ancient-btn" id="restart">重行此卷</button>
+      <button class="ancient-btn" id="fullscreen">铺展全屏</button>
+    </section>
+    <label class="file-row">若备有专业男声旁白，可载入完整音轨（MP3 / WAV），将与镜头及配乐同步。<input type="file" id="voice-file" accept="audio/*"></label>
+    <div class="hint">自动诗境：按分镜行进。漫游：W、A、S、D 行走，鼠标转身。录制时请选择当前标签页并勾选共享音频。成片先保存为 WebM，再以剪映导出 MP4。</div>
+  </aside>
+  <section class="frame-wrap">
+    <div id="world"></div><div class="frame-vignette"></div><div class="frame-top">滕 王 阁 序 · 江 天 一 阁</div>
+    <div class="frame-caption"><div class="chapter" id="chapter-live">云销雨霁</div><div class="verse" id="verse-live">云销雨霁，彩彻区明</div><div class="note" id="note-live">檐雨初歇，天光乍开。</div></div>
+    <div class="frame-progress"><span id="progress-live"></span></div>
+    <div class="intro" id="intro"><div class="intro-small">王 勃 · 江 南 诗 境</div><h2>滕 王 阁 序</h2><p>云开之后，江天有一阁</p><button id="close-intro">展 卷 入 境</button></div>
+  </section>
+</main>
+<div class="toast" id="toast"></div>
+<script type="module" src="./src/app.js"></script>
+</body>
+</html>
