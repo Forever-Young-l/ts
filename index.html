@@ -3,154 +3,90 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#101816">
-<title>江天一阁 · 走进《滕王阁序》</title>
+<meta name="theme-color" content="#8e9b86">
+<title>滕王阁 · 江南方块世界</title>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
 <style>
-:root{
-  --ink:#111a18;--ink2:#1b2925;--jade:#263b35;--paper:#e9dfc8;
-  --muted:#a99d82;--gold:#b99a67;--gold-soft:rgba(190,160,105,.38);
-  --cinnabar:#8d4035;--line:rgba(197,169,116,.24);
-}
+:root{color-scheme:dark;--ink:#17221e;--paper:#f0e5cb;--gold:#d7bd84;--panel:rgba(20,31,27,.72);--line:rgba(238,218,176,.28)}
 *{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--ink);color:var(--paper)}
-body{font-family:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;background:
-radial-gradient(ellipse at 73% 48%,rgba(52,77,66,.22),transparent 46%),
-linear-gradient(135deg,#17231f 0%,#101816 52%,#0d1312 100%)}
-button,input{font:inherit}
-.workbench{height:100%;width:100%;display:grid;grid-template-columns:320px 1fr;align-items:center;gap:clamp(26px,5vw,84px);padding:34px clamp(24px,5vw,88px)}
-.side{width:320px;max-width:320px;display:flex;flex-direction:column;gap:22px;align-self:center}
-.brand{position:relative;padding:0 0 20px;border-bottom:1px solid var(--line)}
-.brand:after{content:"";position:absolute;bottom:-1px;left:0;width:52px;height:1px;background:var(--gold)}
-.brand-top{display:flex;align-items:center;gap:12px;color:var(--gold);font-size:11px;letter-spacing:.28em}
-.seal{width:34px;height:34px;display:grid;place-items:center;border:1px solid #a64f40;color:#c47a61;font-size:17px;line-height:1}
-.brand h1{font-weight:400;font-size:28px;letter-spacing:.12em;margin:15px 0 6px;color:#f0e6d2}
-.brand p{margin:0;color:#a99c81;font-size:12px;letter-spacing:.12em}
-.section-kicker{font-size:10px;letter-spacing:.25em;color:var(--gold);margin-bottom:9px}
-.chapter-panel{padding:17px 18px 16px;border:1px solid var(--line);background:linear-gradient(135deg,rgba(45,61,52,.66),rgba(24,35,31,.72));box-shadow:0 14px 40px rgba(0,0,0,.18)}
-.chapter-panel h2{font-weight:400;font-size:22px;letter-spacing:.12em;margin:0 0 8px;color:#eee2c7}
-.chapter-panel .verse{font-size:16px;line-height:1.9;color:#d9c9a8}
-.chapter-panel .note{font-size:11px;color:#a99b7e;margin-top:6px;letter-spacing:.08em}
-.journey{padding:2px 1px 0}
-.journey-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.journey-head strong{font-size:13px;font-weight:400;letter-spacing:.12em;color:#d8c9aa}
-.journey-head span{font-size:10px;letter-spacing:.12em;color:#8e927f}
-.chapter-list{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
-.chapter-dot{height:3px;background:rgba(199,181,143,.16);position:relative;overflow:hidden}
-.chapter-dot.active{background:var(--gold)}
-.chapter-names{display:flex;justify-content:space-between;margin-top:9px;color:#8f907d;font-size:10px;letter-spacing:.06em}
-.actions{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
-.ancient-btn{position:relative;min-height:42px;padding:10px 12px;border:1px solid rgba(194,166,111,.32);background:rgba(39,53,46,.46);color:#d8c9a8;font-size:12px;letter-spacing:.13em;cursor:pointer;transition:background .22s,border-color .22s,transform .22s}
-.ancient-btn:hover{background:rgba(67,83,68,.58);border-color:rgba(207,177,119,.68);transform:translateY(-1px)}
-.ancient-btn.primary{grid-column:1/-1;min-height:48px;background:linear-gradient(120deg,#8f4639,#682e2a);border-color:#b47b5d;color:#f2e5cc;letter-spacing:.22em;font-size:14px;box-shadow:0 5px 18px rgba(0,0,0,.22)}
-.ancient-btn.primary:hover{background:linear-gradient(120deg,#a45642,#78352d)}
-.ancient-btn.active{border-color:#d0b27a;color:#f1dfbd;box-shadow:inset 0 0 0 1px rgba(208,178,122,.18)}
-.file-stack{display:grid;gap:10px}
-.file-row{display:flex;flex-direction:column;gap:6px;color:#a99b7e;font-size:11px;letter-spacing:.06em}
-.file-row input{width:100%;font:11px "Noto Serif SC",serif;color:#d2c3a2;background:rgba(12,19,17,.5);border:1px solid rgba(197,169,116,.2);padding:8px}
-.file-row input::file-selector-button{border:1px solid rgba(197,169,116,.35);background:#27382f;color:#d8c9a8;padding:5px 8px;margin-right:8px;font:11px serif}
-.hint{border-top:1px solid var(--line);padding-top:12px;color:#7f897b;font-size:10px;line-height:1.9;letter-spacing:.04em}
-.frame-wrap{position:relative;justify-self:center;height:min(94vh,177.777vw);width:min(52.9vh,52vw);aspect-ratio:9/16;overflow:hidden;background:#253b3a;border:1px solid rgba(195,164,108,.62);box-shadow:0 0 0 5px rgba(31,40,33,.9),0 0 0 6px rgba(166,132,79,.32),0 28px 90px rgba(0,0,0,.52)}
-.frame-wrap:before{content:"";position:absolute;z-index:3;inset:9px;border:1px solid rgba(224,203,158,.18);pointer-events:none}
-#world{position:absolute;inset:0}
-.scene-canvas{display:block;width:100%;height:100%}
-.frame-vignette{position:absolute;inset:0;pointer-events:none;background:
-linear-gradient(180deg,rgba(9,17,17,.38),transparent 18%,transparent 68%,rgba(9,15,14,.54)),
-radial-gradient(ellipse at 50% 48%,transparent 46%,rgba(8,14,13,.27) 100%);box-shadow:inset 0 0 80px rgba(8,13,12,.36)}
-.frame-top{position:absolute;z-index:2;top:28px;left:0;right:0;text-align:center;color:rgba(235,218,181,.83);font-size:10px;letter-spacing:.38em;text-shadow:0 2px 12px #000}
-.frame-caption{position:absolute;z-index:2;left:30px;right:30px;bottom:76px;text-align:center;text-shadow:0 2px 16px rgba(0,0,0,.8),0 0 30px rgba(0,0,0,.8)}
-.frame-caption .chapter{font-size:11px;color:#d4b57b;letter-spacing:.3em;margin-bottom:12px}
-.frame-caption .verse{font-size:22px;line-height:1.75;letter-spacing:.08em;color:#f2e8d2}
-.frame-caption .note{font-size:11px;color:rgba(226,211,179,.82);margin-top:9px;letter-spacing:.12em}
-.frame-progress{position:absolute;z-index:3;bottom:27px;left:32px;right:32px;height:1px;background:rgba(229,211,169,.25)}
-.frame-progress span{display:block;width:0;height:1px;background:#d5b47b;box-shadow:0 0 8px #e2c98e}
-.intro{position:absolute;z-index:5;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;background:linear-gradient(180deg,rgba(10,22,23,.55),rgba(10,18,17,.67));transition:opacity 1.2s}
+html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#91a18d;color:var(--paper);font-family:"Noto Serif SC","Songti SC","STSong",serif}
+button{font:inherit}
+#world{position:fixed;inset:0;background:linear-gradient(#829b9b,#e4bd91 58%,#5c7467)}
+.voxel-canvas{display:block;width:100%;height:100%;outline:none;touch-action:none}
+.topbar{position:fixed;z-index:3;left:0;right:0;top:0;display:flex;align-items:center;justify-content:space-between;padding:20px 26px;pointer-events:none;background:linear-gradient(180deg,rgba(10,20,17,.46),transparent)}
+.brand{display:flex;align-items:center;gap:12px;text-shadow:0 2px 12px #14221d}
+.brand-mark{width:32px;height:32px;display:grid;place-items:center;border:1px solid rgba(225,197,140,.72);background:rgba(83,48,37,.72);color:#f0d6a1;font-size:17px}
+.brand-title{font-size:16px;letter-spacing:.18em;color:#fff1d4}
+.brand-sub{margin-top:3px;font:9px/1.2 Arial,sans-serif;letter-spacing:.24em;color:rgba(255,240,213,.76)}
+.top-actions{display:flex;align-items:center;gap:8px;pointer-events:auto}
+.mode{font-size:11px;letter-spacing:.1em;color:#f5e8ca;padding:8px 12px;background:rgba(17,29,25,.45);border:1px solid var(--line)}
+.ui-btn{border:1px solid rgba(237,215,170,.42);background:rgba(20,32,27,.68);color:#f2e5c8;padding:9px 13px;font-size:11px;letter-spacing:.08em;cursor:pointer;backdrop-filter:blur(8px);transition:.18s}
+.ui-btn:hover,.ui-btn.selected{background:rgba(135,75,49,.88);border-color:#e0bd7e;color:#fff0ce}
+.bottom-bar{position:fixed;z-index:3;left:0;right:0;bottom:0;display:flex;justify-content:space-between;align-items:end;padding:28px 28px 22px;background:linear-gradient(0deg,rgba(11,20,17,.58),transparent);pointer-events:none}
+.scene-name{font-size:13px;letter-spacing:.16em;color:#fff0d0;text-shadow:0 2px 10px #17211d}
+.scene-sub{margin-top:5px;font-size:10px;letter-spacing:.12em;color:rgba(255,239,211,.76)}
+.hints{font:11px/1.8 Arial,sans-serif;letter-spacing:.05em;color:rgba(255,245,220,.84);text-align:center;text-shadow:0 2px 8px #17211d}
+#coords{font:10px Arial,sans-serif;letter-spacing:.08em;color:rgba(255,245,220,.7);text-align:right}
+.reticle{position:fixed;z-index:2;left:50%;top:50%;width:16px;height:16px;transform:translate(-50%,-50%);pointer-events:none;opacity:.8}
+.reticle:before,.reticle:after{content:"";position:absolute;background:rgba(255,247,222,.82);box-shadow:0 1px 3px #25332b}
+.reticle:before{left:7px;top:1px;width:2px;height:14px}
+.reticle:after{left:1px;top:7px;width:14px;height:2px}
+.intro{position:fixed;z-index:5;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:linear-gradient(180deg,rgba(13,27,24,.32),rgba(13,27,24,.56));transition:opacity .7s}
 .intro.hidden{opacity:0;pointer-events:none}
-.intro:before,.intro:after{content:"";position:absolute;left:50%;width:1px;height:54px;background:linear-gradient(transparent,rgba(208,180,127,.75),transparent)}
-.intro:before{top:17%}.intro:after{bottom:17%}
-.intro .intro-small{font-size:10px;letter-spacing:.46em;color:#d5bd8e}
-.intro h2{font-weight:400;font-size:44px;letter-spacing:.24em;margin:24px 0 12px;color:#f3e8d1;text-shadow:0 4px 28px #000}
-.intro p{font-size:12px;letter-spacing:.25em;color:#d1c2a1;margin:0 0 36px}
-.intro button{font:14px "Noto Serif SC","Songti SC",serif;letter-spacing:.25em;color:#f1e4c8;background:linear-gradient(120deg,#91483b,#672e29);border:1px solid #c39a6b;padding:13px 32px;cursor:pointer;box-shadow:0 5px 20px rgba(0,0,0,.28);transition:.2s}
-.intro button:hover{filter:brightness(1.12);transform:translateY(-2px)}
-.toast{position:fixed;z-index:10;bottom:24px;left:50%;transform:translate(-50%,16px);opacity:0;pointer-events:none;background:#e4d5b5;color:#392b20;border:1px solid #b39462;padding:10px 18px;font-size:12px;box-shadow:0 5px 24px #0006;transition:.3s;white-space:nowrap}
+.intro:before,.intro:after{content:"";position:absolute;left:50%;width:1px;height:70px;background:linear-gradient(transparent,rgba(241,216,165,.85),transparent)}
+.intro:before{top:13%}.intro:after{bottom:13%}
+.intro small{font:10px Arial,sans-serif;letter-spacing:.42em;color:#f0d49b}
+.intro h1{font-weight:500;font-size:clamp(46px,7vw,82px);letter-spacing:.24em;margin:22px 0 10px;color:#fff0d2;text-shadow:0 4px 26px rgba(8,17,14,.8)}
+.intro p{font-size:13px;letter-spacing:.2em;color:rgba(255,238,207,.88);margin:0 0 34px}
+.enter-btn{border:1px solid #e0c18a;background:linear-gradient(135deg,#8e4d35,#5b372b);color:#fff0d1;padding:13px 34px;font-size:13px;letter-spacing:.22em;cursor:pointer;box-shadow:0 8px 28px rgba(0,0,0,.3)}
+.enter-btn:hover{filter:brightness(1.12);transform:translateY(-1px)}
+.toast{position:fixed;z-index:8;left:50%;bottom:82px;transform:translate(-50%,12px);opacity:0;padding:10px 16px;background:rgba(20,31,27,.88);border:1px solid var(--line);color:#f1e3c5;font-size:11px;letter-spacing:.06em;transition:.25s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1;transform:translate(-50%,0)}
-@media(max-width:900px){
- .workbench{display:block;padding:0}
- .frame-wrap{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);height:min(100dvh,177.777vw);width:min(100vw,56.25dvh);max-width:100vw;border:0;box-shadow:none}
- .frame-wrap:before{inset:8px}
- .side{position:absolute;z-index:6;left:12px;right:12px;bottom:12px;width:auto;max-width:none;display:grid;grid-template-columns:1fr;gap:8px;pointer-events:none}
- .brand,.chapter-panel,.journey,.hint{display:none}
- .actions{pointer-events:auto;grid-template-columns:repeat(3,1fr);gap:6px}
- .ancient-btn{min-height:38px;padding:8px 4px;font-size:11px;background:rgba(23,35,30,.88);backdrop-filter:blur(10px)}
- .ancient-btn.primary{grid-column:1/-1;min-height:42px;background:rgba(123,57,46,.94)}
- .file-stack{pointer-events:auto;grid-template-columns:1fr 1fr;gap:6px}
- .file-row{background:rgba(17,26,23,.85);padding:6px 8px;font-size:10px;backdrop-filter:blur(10px)}
- .file-row input{font-size:9px;padding:5px}
- .frame-caption{bottom:144px}
- .frame-caption .verse{font-size:20px}
-}
-@media(max-width:520px){
- .frame-wrap{width:100vw;height:100dvh}
- .frame-caption{left:20px;right:20px}
- .frame-caption .verse{font-size:18px}
- .intro h2{font-size:35px}
+.touch-pad{display:none;position:fixed;z-index:4;left:18px;bottom:76px;grid-template-columns:repeat(3,46px);grid-template-rows:repeat(2,46px);gap:5px}
+.touch-btn{border:1px solid rgba(241,222,184,.4);background:rgba(17,31,26,.46);color:#fff0d2;font:17px Arial,sans-serif;touch-action:none;user-select:none}
+.touch-btn.pressed{background:rgba(143,81,53,.85)}
+.touch-btn.up{grid-column:2;grid-row:1}.touch-btn.left{grid-column:1;grid-row:2}.touch-btn.down{grid-column:2;grid-row:2}.touch-btn.right{grid-column:3;grid-row:2}
+@media(max-width:760px){
+ .topbar{padding:12px 12px}.brand-title{font-size:12px}.brand-sub{font-size:8px}.brand-mark{width:28px;height:28px}
+ .top-actions{gap:5px}.mode{display:none}.ui-btn{padding:8px 9px;font-size:10px}
+ .bottom-bar{padding:18px 14px 14px}.hints{display:none}.scene-name{font-size:11px}#coords{font-size:9px}
+ .touch-pad{display:grid}.toast{bottom:138px;max-width:calc(100vw - 30px);white-space:normal;text-align:center}
+ .intro p{font-size:11px}.enter-btn{padding:12px 26px}
 }
 </style>
 </head>
 <body>
-<main class="workbench">
-  <aside class="side">
-    <header class="brand">
-      <div class="brand-top"><span class="seal">诗</span><span>江 南 纪 行 · 诗 境 卷</span></div>
-      <h1>走进《滕王阁序》</h1>
-      <p>第一人称 · 秋水长天 · 八十息诗旅</p>
-    </header>
-    <section class="chapter-panel">
-      <div class="section-kicker">此刻诗境 · <span id="status">诗境 01 / 六</span></div>
-      <h2 id="chapter">云销雨霁</h2>
-      <div class="verse" id="verse">云销雨霁，彩彻区明</div>
-      <div class="note" id="note">檐雨初歇，天光乍开。</div>
-    </section>
-    <section class="journey">
-      <div class="journey-head"><strong>六境行旅</strong><span>80 SEC · ONE TAKE</span></div>
-      <div class="chapter-list"><i class="chapter-dot active"></i><i class="chapter-dot"></i><i class="chapter-dot"></i><i class="chapter-dot"></i><i class="chapter-dot"></i><i class="chapter-dot"></i></div>
-      <div class="chapter-names"><span>云开</span><span>暮山</span><span>落霞</span><span>归舟</span><span>雁影</span><span>长江</span></div>
-    </section>
-    <section class="actions">
-      <button class="ancient-btn primary" id="play">启卷入境</button>
-      <button class="ancient-btn" id="record">录制诗境</button>
-      <button class="ancient-btn" id="roam">随行漫游</button>
-      <button class="ancient-btn" id="day">昼夜流转</button>
-      <button class="ancient-btn" id="listen">试听诵读</button>
-      <button class="ancient-btn" id="narrator">诵读：开</button>
-      <button class="ancient-btn" id="restart">重行此卷</button>
-      <button class="ancient-btn" id="fullscreen">铺展全屏</button>
-    </section>
-    <div class="file-stack">
-      <label class="file-row">男声旁白音轨（MP3 / WAV）<input type="file" id="voice-file" accept="audio/*"></label>
-      <label class="file-row">古琴、箫或原创配乐（MP3 / WAV）<input type="file" id="music-file" accept="audio/*"></label>
-    </div>
-    <div class="hint">自动诗境按分镜行进。漫游使用 W、A、S、D 与鼠标转身。录制时请选择当前标签页并共享音频。输出 WebM 后可用剪映导出 MP4。</div>
-  </aside>
-  <section class="frame-wrap">
-    <div id="world"></div>
-    <div class="frame-vignette"></div>
-    <div class="frame-top">王 勃 · 滕 王 阁 序</div>
-    <div class="frame-caption">
-      <div class="chapter" id="chapter-live">云销雨霁</div>
-      <div class="verse" id="verse-live">云销雨霁，彩彻区明</div>
-      <div class="note" id="note-live">檐雨初歇，天光乍开。</div>
-    </div>
-    <div class="frame-progress"><span id="progress-live"></span></div>
-    <div class="intro" id="intro">
-      <div class="intro-small">王 勃 · 江 南 诗 境</div>
-      <h2>滕 王 阁 序</h2>
-      <p>云开之后，江天有一阁</p>
-      <button id="close-intro">展 卷 入 境</button>
-    </div>
-  </section>
-</main>
+<div id="world"></div>
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-mark">阁</div>
+    <div><div class="brand-title">滕 王 阁</div><div class="brand-sub">VOXEL JIANGNAN · 1.0</div></div>
+  </div>
+  <div class="top-actions">
+    <span class="mode" id="mode">自由探索</span>
+    <button class="ui-btn" id="tour">自动导览</button>
+    <button class="ui-btn" id="reset">重置视角</button>
+    <button class="ui-btn" id="fullscreen">全屏</button>
+  </div>
+</header>
+<div class="reticle"></div>
+<footer class="bottom-bar">
+  <div><div class="scene-name">江天一阁 · 方块江南</div><div class="scene-sub">云销雨霁 · 落霞秋水</div></div>
+  <div class="hints">W A S D 移动　·　鼠标环顾　·　Shift 奔跑　·　Space 跳跃</div>
+  <div id="coords">位置 0 / 38</div>
+</footer>
+<div class="touch-pad" aria-label="移动控制">
+  <button class="touch-btn up" data-key="w">↑</button>
+  <button class="touch-btn left" data-key="a">←</button>
+  <button class="touch-btn down" data-key="s">↓</button>
+  <button class="touch-btn right" data-key="d">→</button>
+</div>
+<div class="intro" id="intro">
+  <small>VOXEL WORLD · JIANGNAN</small>
+  <h1>滕王阁</h1>
+  <p>走进《滕王阁序》的方块江南</p>
+  <button class="enter-btn" id="enter">进入世界</button>
+</div>
 <div class="toast" id="toast"></div>
 <script type="module" src="./src/app.js"></script>
 </body>
