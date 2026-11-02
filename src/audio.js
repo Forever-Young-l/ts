@@ -1,5 +1,5 @@
 export class AudioDirector {
-  constructor(){this.ctx=null;this.master=null;this.destination=null;this.noiseGain=null;this.voiceElement=null;this.voiceNode=null;this.hasVoiceFile=false;this.nextPluck=0;this.noteIndex=0;this.delay=null;this.feedback=null;}
+  constructor(){this.ctx=null;this.master=null;this.destination=null;this.noiseGain=null;this.voiceElement=null;this.voiceNode=null;this.hasVoiceFile=false;this.musicElement=null;this.musicNode=null;this.hasMusicFile=false;this.nextPluck=0;this.noteIndex=0;this.delay=null;this.feedback=null;}
   async start(){
     if(!this.ctx){
       const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return null;
@@ -21,17 +21,20 @@ export class AudioDirector {
       this.drone2=this.ctx.createOscillator();this.drone2.type='sine';this.drone2.frequency.value=164.81;
       this.droneGain2=this.ctx.createGain();this.droneGain2.gain.value=.009;this.drone2.connect(this.droneGain2);this.droneGain2.connect(this.master);this.drone2.start();
       if(this.voiceElement&&!this.voiceNode){this.voiceNode=this.ctx.createMediaElementSource(this.voiceElement);this.voiceNode.connect(this.master);}
+      if(this.musicElement&&!this.musicNode){this.musicNode=this.ctx.createMediaElementSource(this.musicElement);this.musicNode.connect(this.master);}
     }
     if(this.ctx.state==='suspended')await this.ctx.resume();
     return this.destination?.stream;
   }
   getStream(){return this.destination?.stream||new MediaStream();}
   update(t){
-    if(!this.ctx||this.ctx.currentTime<this.nextPluck)return;
-    const scale=[146.83,164.81,196,220,261.63,293.66,329.63];
-    const f=scale[this.noteIndex%scale.length];this.noteIndex++;
-    this.pluck(f,t>24&&t<54?.8:1);
-    this.nextPluck=this.ctx.currentTime+(t<20?2.4:1.65);
+    if(!this.ctx)return;
+    if(!this.hasMusicFile&&this.ctx.currentTime>=this.nextPluck){
+      const scale=[146.83,164.81,196,220,261.63,293.66,329.63];
+      const f=scale[this.noteIndex%scale.length];this.noteIndex++;
+      this.pluck(f,t>24&&t<54?.8:1);
+      this.nextPluck=this.ctx.currentTime+(t<20?2.4:1.65);
+    }
     if(this.noiseGain)this.noiseGain.gain.setTargetAtTime(t<8?.028:t>65?.012:.018,this.ctx.currentTime,.8);
   }
   pluck(freq,volume=1){
@@ -50,9 +53,16 @@ export class AudioDirector {
     this.voiceNode=this.ctx.createMediaElementSource(this.voiceElement);this.voiceNode.connect(this.master);this.hasVoiceFile=true;
   }
   startVoiceTrack(){if(this.hasVoiceFile&&this.voiceElement){this.voiceElement.currentTime=0;this.voiceElement.play().catch(()=>{});}}
-  pauseVoice(){this.voiceElement?.pause();if(window.speechSynthesis)window.speechSynthesis.pause();}
-  resumeVoice(){this.voiceElement?.play().catch(()=>{});if(window.speechSynthesis)window.speechSynthesis.resume();}
-  stopVoice(){this.voiceElement?.pause();if(this.voiceElement)this.voiceElement.currentTime=0;this.stopSpeech();}
+  async loadMusicFile(file){
+    await this.start();
+    if(this.musicElement){this.musicElement.pause();this.musicElement.remove();}
+    this.musicElement=new Audio(URL.createObjectURL(file));this.musicElement.preload='auto';
+    this.musicNode=this.ctx.createMediaElementSource(this.musicElement);this.musicNode.connect(this.master);this.hasMusicFile=true;
+  }
+  startMusicTrack(){if(this.hasMusicFile&&this.musicElement){this.musicElement.currentTime=0;this.musicElement.play().catch(()=>{});}}
+  pauseVoice(){this.voiceElement?.pause();this.musicElement?.pause();if(window.speechSynthesis)window.speechSynthesis.pause();this.master?.gain.setTargetAtTime(.0001,this.ctx.currentTime,.18);}
+  resumeVoice(){this.master?.gain.setTargetAtTime(.72,this.ctx.currentTime,.25);this.voiceElement?.play().catch(()=>{});this.musicElement?.play().catch(()=>{});if(window.speechSynthesis)window.speechSynthesis.resume();}
+  stopVoice(){this.voiceElement?.pause();this.musicElement?.pause();if(this.voiceElement)this.voiceElement.currentTime=0;if(this.musicElement)this.musicElement.currentTime=0;this.stopSpeech();}
   stopSpeech(){if(window.speechSynthesis)window.speechSynthesis.cancel();}
   speak(text){
     if(!('speechSynthesis'in window))return;
