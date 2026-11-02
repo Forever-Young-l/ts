@@ -42,6 +42,7 @@ button{font:inherit}
 .enter-btn:hover{filter:brightness(1.12);transform:translateY(-1px)}
 .toast{position:fixed;z-index:8;left:50%;bottom:82px;transform:translate(-50%,12px);opacity:0;padding:10px 16px;background:rgba(20,31,27,.88);border:1px solid var(--line);color:#f1e3c5;font-size:11px;letter-spacing:.06em;transition:.25s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1;transform:translate(-50%,0)}
+#boot-error{position:fixed;z-index:20;left:50%;top:50%;transform:translate(-50%,-50%);width:min(520px,calc(100vw - 32px));padding:18px 20px;background:rgba(37,25,22,.96);border:1px solid #d5aa73;color:#fff0d2;font-size:13px;line-height:1.8;text-align:center;box-shadow:0 12px 50px rgba(0,0,0,.4)}
 .touch-pad{display:none;position:fixed;z-index:4;left:18px;bottom:76px;grid-template-columns:repeat(3,46px);grid-template-rows:repeat(2,46px);gap:5px}
 .touch-btn{border:1px solid rgba(241,222,184,.4);background:rgba(17,31,26,.46);color:#fff0d2;font:17px Arial,sans-serif;touch-action:none;user-select:none}
 .touch-btn.pressed{background:rgba(143,81,53,.85)}
@@ -88,6 +89,16 @@ button{font:inherit}
   <button class="enter-btn" id="enter">进入世界</button>
 </div>
 <div class="toast" id="toast"></div>
-<script type="module" src="./src/app.js"></script>
+<div id="boot-error" role="alert" hidden></div>
+<script type="module">
+try {
+  await import('./src/app.js');
+} catch (error) {
+  console.error('Voxel world failed to start:', error);
+  const panel = document.getElementById('boot-error');
+  panel.hidden = false;
+  panel.textContent = '场景启动失败：' + (error && error.message ? error.message : '资源加载异常') + '。请刷新页面重试。';
+}
+</script>
 </body>
 </html>
