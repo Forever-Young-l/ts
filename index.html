@@ -92,13 +92,13 @@ button{font:inherit}
 <div id="boot-error" role="alert" hidden></div>
 <script type="module">
 try {
-  await import('./src/app.js');
-} catch (error) {
+  import('./src/app.js?v=voxel-fix-1').catch(error => {
   console.error('Voxel world failed to start:', error);
   const panel = document.getElementById('boot-error');
   panel.hidden = false;
   panel.textContent = '场景启动失败：' + (error && error.message ? error.message : '资源加载异常') + '。请刷新页面重试。';
-}
+});
+
 </script>
 </body>
 </html>
