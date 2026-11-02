@@ -62,7 +62,7 @@ document.addEventListener('mousemove',e=>{if(manual&&document.pointerLockElement
 document.addEventListener('pointerlockchange',()=>{if(!document.pointerLockElement&&manual)toast('轻触画面可继续漫游。');});
 
 async function startJourney(){
-  await audio.start();intro.classList.add('hidden');manual=false;cinematic=true;finished=false;elapsed=0;lastChapter=-1;startedAt=performance.now();
+  await audio.start();intro.classList.add('hidden');manual=false;manualNight=false;cinematic=true;finished=false;elapsed=0;lastChapter=-1;startedAt=performance.now();
   camera.position.set(0,1.72,31);updateCaption(0);if(narratorEnabled)audio.startVoiceTrack();
   playBtn.textContent='暂停诗境';toast('诗卷已展开，请随镜而行。');
 }
