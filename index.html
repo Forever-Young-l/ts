@@ -46,7 +46,7 @@ body{background:radial-gradient(ellipse at 50% 46%,#3b4139 0%,#1c211e 56%,#12161
 .toast.show{opacity:1;transform:translate(-50%,0)}.mini-title{font-size:11px;color:#c9ad7d;letter-spacing:.22em}
 .progress-label{display:flex;justify-content:space-between;color:#ad9873;font-size:11px;margin-top:9px}
 @media(max-width:900px){
- .workbench{padding:0;display:block}.frame-wrap{height:100dvh;width:56.25dvh;max-width:100vw;margin:0 auto;border:0;box-shadow:none}
+ .workbench{padding:0;display:block}.frame-wrap{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);height:min(100dvh,177.777vw);width:min(100vw,56.25dvh);max-width:100vw;margin:0;border:0;box-shadow:none}
  .side{position:absolute;z-index:4;left:10px;right:10px;bottom:10px;width:auto;max-width:none;display:grid;grid-template-columns:1fr;gap:7px;pointer-events:none}
  .brand,.scroll,.hint{display:none}.actions{pointer-events:auto;grid-template-columns:repeat(3,1fr);gap:6px}
  .ancient-btn{padding:8px 4px;font-size:13px;background:rgba(224,207,169,.92)}.ancient-btn.primary{background:rgba(130,55,43,.96)}
