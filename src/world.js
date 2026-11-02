@@ -62,7 +62,7 @@ function fillLayer(x1, x2, z1, z2, y, colors, sy = .8, sx = 1, sz = 1) {
   let n = 0;
   for (let x = x1; x <= x2; x += 1) {
     for (let z = z1; z <= z2; z += 1) {
-      const c = Array.isArray(colors) ? colors[(n + Math.floor(x * 7 + z * 3)) % colors.length] : colors;
+      const c = Array.isArray(colors) ? colors[((n + Math.floor(x * 7 + z * 3)) % colors.length + colors.length) % colors.length] : colors;
       addBlock(x, y, z, sx, sy, sz, c);
       n++;
     }
