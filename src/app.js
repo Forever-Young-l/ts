@@ -89,7 +89,7 @@ function frame(now){
     setCameraAt(elapsed);updateCaption(elapsed);
     if(elapsed>=DURATION&&!finished){finished=true;cinematic=false;audio.pauseVoice();playBtn.textContent='重启诗境';toast('诗境已尽。长江仍在，余韵未散。');if(recordActive)stopRecording();}
   }else if(manual){elapsed+=dt;updateManual(dt);}
-  const worldTime=cinematic?elapsed:(manual?12+now/100000:manualNight?78:12);
+  const worldTime=cinematic||(!manual&&elapsed>0)?elapsed:(manual?12+now/100000:manualNight?78:12);
   updateWorld(worldTime,dt,manualNight);audio.update(worldTime);renderWorld();drawRecordFrame(elapsed);
   requestAnimationFrame(frame);
 }
