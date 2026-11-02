@@ -51,6 +51,10 @@ const cube = new THREE.BoxGeometry(1, 1, 1);
 const temp = new THREE.Object3D();
 
 function addBlock(x, y, z, sx, sy, sz, color) {
+  if (Array.isArray(color)) color = color.find(value => typeof value === 'string');
+  if (typeof color !== 'string' || !color.startsWith('#')) {
+    throw new TypeError('Voxel block color must be a hex color string; received ' + String(color));
+  }
   if (!staticBlocks.has(color)) staticBlocks.set(color, []);
   temp.position.set(x, y, z);
   temp.rotation.set(0, 0, 0);
@@ -203,13 +207,13 @@ function buildPavilion() {
   for (let i = 0; i < 8; i++) {
     const zz = 23 - i * 1.55;
     const yy = .05 + i * .11;
-    addBlock(0, yy, zz, 6.5, .25 + i * .02, 1.7, i % 2 ? palette.stone : palette.stoneLight);
+    addBlock(0, yy, zz, 6.5, .25 + i * .02, 1.7, i % 2 ? palette.stone[i % palette.stone.length] : palette.stoneLight);
     addBlock(-3.55, yy + .15, zz, .55, .45, 1.7, palette.stoneDark);
     addBlock(3.55, yy + .15, zz, .55, .45, 1.7, palette.stoneDark);
   }
   for (let zPath = 26; zPath <= 35; zPath++) {
     for (let x = -3; x <= 3; x++) {
-      addBlock(x, -.02, zPath, .95, .16, .95, (x + zPath) % 3 ? palette.stone : palette.stoneLight);
+      addBlock(x, -.02, zPath, .95, .16, .95, (x + zPath) % 3 ? palette.stone[((x + zPath) % palette.stone.length + palette.stone.length) % palette.stone.length] : palette.stoneLight);
     }
   }
 
